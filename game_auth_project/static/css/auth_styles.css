@@ -1,0 +1,169 @@
+
+
+.auth-form-control {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ffffff55;
+    border-radius: 0;
+    color: white;
+    padding: 10px 15px;
+    width: 100%;
+    margin-bottom: 15px;
+    height: 40px;
+}
+
+.auth-form-control::placeholder {
+    color: #ffffff;
+    opacity: 0.7;
+    font-size: 0.9em;
+}
+
+.auth-form-control:focus {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: #ffffff88;
+    outline: none;
+    box-shadow: none;
+    color: white;
+}
+
+.auth-btn {
+    width: 150px;
+    background: #555;
+    border: 2px solid #9d9d9c;
+    height: 39px;
+    display: flex;
+    color: #ffffff;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0;
+    font-weight: bold;
+    margin-left: auto;
+}
+
+.auth-btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.auth-link {
+    color: #ffffff;
+    text-decoration: none;
+    margin-top: 1.5rem;
+    display: block;
+    text-align: center;
+}
+
+.auth-link:hover {
+    color: #3498db;
+    text-decoration: underline;
+}
+
+.auth-title {
+    color: #eee;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+}
+.signup-container .auth-form-control{
+    height:35px;
+}
+
+.home-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: white;
+    text-align: center;
+  }
+
+  .hero-section {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #ffffff55;
+  }
+
+  .hero-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+
+  .download-section {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 2rem;
+    border-radius: 10px;
+    border: 1px solid #3498db;
+  }
+
+  .download-title {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .download-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .download-btn {
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+  }
+
+  .windows-btn {
+    background-color: #0078d7;
+    color: white;
+  }
+
+  .mac-btn {
+    background-color: #000000;
+    color: white;
+    border: 1px solid #555;
+  }
+
+  .download-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .download-btn i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .download-buttons {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .download-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  #id_remember, #id_remember + label {
+  display: none !important;
+}
+  #id_password1_helptext {
+    color: #ffffff88; 
+  } 

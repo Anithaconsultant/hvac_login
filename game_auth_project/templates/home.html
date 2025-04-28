@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="home-container">
+  {% if user.is_authenticated %}
+  <div class="mt-3">
+    <a href="{% url 'account_logout' %}" class="btn btn-danger">Logout</a>
+  </div>
+  <div class="hero-section">
+    <h1 class="hero-title">Welcome!</h1>
+    <p class="hero-description">
+      Your mission is to analyze the design and usage patterns of buildings,
+      identify energy-consuming systems, evaluate HVAC system design and
+      operation, and assess building energy performance.
+    </p>
+    <p>Download the executable game and start playing!</p>
+    <div class="download-buttons">
+      <a href="#" class="download-btn windows-btn">
+        <i class="fab fa-windows"></i> Download for Windows
+      </a>
+      <a href="#" class="download-btn mac-btn">
+        <i class="fab fa-apple"></i> Download for Mac
+      </a>
+    </div>
+  </div>
+  {% else %} {% include "account/login.html" %} {% endif %}
+</div>
+{% endblock %}

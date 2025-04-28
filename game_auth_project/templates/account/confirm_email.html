@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="confirm-container">
+    <h1 class="auth-title">Verify Your Email Address</h1>
+    
+    <div class="auth-message">
+        <p>We have sent an email to you for verification.</p>
+        <p>Follow the link provided to finalize the signup process.</p>
+    </div>
+    
+    <div class="auth-note">
+        <p><i class="fas fa-exclamation-circle"></i> If you don't see the verification email in your main inbox, check your spam folder.</p>
+        <p><i class="fas fa-clock"></i> Please contact us if you don't receive the verification email within a few minutes.</p>
+    </div>
+    
+    <div class="auth-actions">
+        <a href="{% url 'account_login' %}" class="auth-btn">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+        <a href="{% url 'account_signup' %}" class="auth-btn secondary">
+            <i class="fas fa-user-plus"></i> Sign Up
+        </a>
+    </div>
+</div>
+
+<style>
+    
+    .auth-title {
+        color: #eee;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+    
+    .auth-message {
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 3px solid #3498db;
+        color: #ffffff;
+    }
+    
+    .auth-message p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-note {
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 1rem;
+        margin-bottom: 2rem;
+        border-left: 3px solid #555;
+    }
+    
+    .auth-note p {
+        color: #ccc;
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .auth-note i {
+        margin-right: 10px;
+        color: #9d9d9c;
+    }
+    
+    .auth-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+    }
+    
+    .auth-btn {
+        flex: 1;
+        background: #555;
+        border: 2px solid #9d9d9c;
+        height: 39px;
+        display: flex;
+        color: #ffffff;
+        justify-content: center;
+        align-items: center;
+        border-radius: 0;
+        font-weight: bold;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .auth-btn:hover {
+        background: #666;
+        border-color: #ffffff88;
+    }
+    
+    .auth-btn i {
+        margin-right: 8px;
+    }
+    
+    .auth-btn.secondary {
+        background: rgba(0, 0, 0, 0.5);
+        border-color: #555;
+    }
+</style>
+{% endblock %}

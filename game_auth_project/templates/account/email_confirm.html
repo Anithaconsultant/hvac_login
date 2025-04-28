@@ -1,0 +1,24 @@
+{% extends "base.html" %} {% block content %}
+<div class="container  d-flex justify-content-center vh-100">
+  <div  style="max-width: 500px; width: 100%">
+    <h2 class="mb-3 text-center" style="color: #fff">Confirm Your Email</h2>
+
+    {% if confirmation %}
+    <p class="text-center">
+      Hi <strong>{{ confirmation.email_address.user.username }}</strong>, click
+      the button below to confirm your email address.
+    </p>
+    <div class="text-center">
+      <form method="post" action=".">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary btn-lg px-5">
+          Confirm Email
+        </button>
+      </form>
+    </div>
+    {% else %}
+    <p class="text-danger text-center">Invalid or expired confirmation link.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
