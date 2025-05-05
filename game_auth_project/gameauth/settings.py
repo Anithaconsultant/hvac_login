@@ -162,6 +162,9 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -237,18 +240,15 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_REPLACE_HTTPS_REFERER = True
 CORS_ALLOWED_ORIGINS = [
-    "https://dbl.iihs.in",
-    "https://10.10.4.129"
+    "https://10.10.10.16"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://dbl.iihs.in',
-    'https://10.10.4.129',
+    'https://10.10.10.16',
 ]
 
 CORS_ORIGIN_WHITELIST = (
-    'https://dbl.iihs.in',
-    'https://10.10.4.129',
+    'https://10.10.10.16',
 )
 CORS_ORIGIN_ALLOW_ALL = False
 

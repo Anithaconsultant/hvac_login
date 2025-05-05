@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny,IsAuthenticated
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model,authenticate
 from .models import UserGameProgress
 from .serializers import CustomTokenObtainPairSerializer, RegisterSerializer,GameProgressSerializer
 import logging
@@ -85,3 +85,29 @@ class GameProgressAPIView(APIView):
                 "status": "error",
                 "message": "Internal server error"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ClientLoginView(APIView):
+    """
+    Custom login view for client authentication.
+    """
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            if user.is_active:
+                # Generate tokens manually
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'status': 'success',
+                    'user_id': user.id,
+                    'email': user.email,
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'detail': 'User account is disabled.'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({'detail': 'Invalid username or password.'}, status=status.HTTP_401_UNAUTHORIZED)

@@ -1,6 +1,8 @@
 {% extends "base.html" %} {% load static %} {% block content %}
 <div class="home-container">
   {% if user.is_authenticated %}
+  {{user}}
+  {user.Firstname}
   <div class="mt-3">
     <a href="{% url 'account_logout' %}" class="btn btn-danger">Logout</a>
   </div>
@@ -13,12 +15,13 @@
     </p>
     <p>Download the executable game and start playing!</p>
     <div class="download-buttons">
-      <a href="#" class="download-btn windows-btn">
+      <a href="{% url 'download_windows' %}" class="download-btn windows-btn">
         <i class="fab fa-windows"></i> Download for Windows
       </a>
-      <a href="#" class="download-btn mac-btn">
+      <a href="{% url 'download_mac' %}" class="download-btn windows-btn">
         <i class="fab fa-apple"></i> Download for Mac
       </a>
+
     </div>
   </div>
   {% else %} {% include "account/login.html" %} {% endif %}

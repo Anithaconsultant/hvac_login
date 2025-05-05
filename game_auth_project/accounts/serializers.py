@@ -32,11 +32,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class GameProgressSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserGameProgress
-        fields = [
-            'level', 'attempt_number', 'completion_status',
-            'points_scored', 'max_points', 'hint_penalty_points',
-            'bonus_points', 'tools_earned', 'badges', 'super_powers'
-        ]
+        fields = '__all__'
     
     def validate(self, data):
         # Custom validation can be added here

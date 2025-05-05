@@ -1,6 +1,7 @@
 import uuid
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from .utils import generate_short_id  
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
@@ -33,7 +34,13 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractUser):
     username = None  # Remove the username field
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(
+        primary_key=True,
+        max_length=8,
+        unique=True,
+        editable=False,
+        default=generate_short_id  # 👈 use it here
+    )
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     email = models.EmailField(unique=True)
