@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="mb-3">
+        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+    </div>
+    <h2 style="color:#fff;">Update Game Progress</h2>
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Regular fields -->
+        {% for field in form %}
+        {% if field.name != 'tools_earned' and field.name != 'badges' and field.name != 'super_powers' %}
+        <div class="form-group">
+            <label  style="color:#fff;">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="error">{{ field.errors }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        <!-- Special JSON fields -->
+        <div class="form-group">
+            <label  style="color:#fff;">Tools Earned</label>
+            <textarea name="tools_earned" class="auth-form-control json-field"
+                placeholder="Enter as comma-separated values, e.g. hammer,wrench,screwdriver">{% if form.tools_earned.value %}{{ form.tools_earned.value }}{% endif %}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label  style="color:#fff;">Badges</label>
+            <textarea name="badges" class="auth-form-control json-field"
+                placeholder="Enter as comma-separated values, e.g. fast_learner,energy_saver">{% if form.badges.value %}{{ form.badges.value }}{% endif %}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label  style="color:#fff;">Super Powers</label>
+            <textarea name="super_powers" class="auth-form-control json-field"
+                placeholder="Enter as comma-separated values, e.g. xray_vision,time_travel">{% if form.super_powers.value %}{{ form.super_powers.value }}{% endif %}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Progress</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
-from accounts.views import redirect_view,CustomEmailVerificationSentView,UserListView,download_windows,download_mac,updateUserBoard  # or accounts.views if you prefer
+from accounts.views import redirect_view,CustomEmailVerificationSentView,UserListView,download_windows,download_mac,update_game_progress,view_progress,leaderboard  # or accounts.views if you prefer
 from accounts.api import CustomTokenObtainPairView, RegisterView,ClientLoginView
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
@@ -23,7 +23,10 @@ urlpatterns = [
     path('api/client-login/', ClientLoginView.as_view(), name='client-login'),
     path('download_windows/', download_windows, name='download_windows'),
     path('download-mac/', download_mac, name='download_mac'),
-    path('api/userboard/<userID>', updateUserBoard, name='updateUserBoard'),
+    path('update-progress/', update_game_progress, name='update_progress'),
+    path('view-progress/', view_progress, name='view_progress'),
+    path('leaderboard/', leaderboard, name='leaderboard'),
+
    
 ]
 

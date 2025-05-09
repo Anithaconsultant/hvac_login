@@ -1,10 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import CustomUser
+from .models import CustomUser,UserGameProgress
 from allauth.account.forms import SignupForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field
-
+import json
 
 class CustomUserCreationForm(SignupForm):
     first_name = forms.CharField(max_length=30, required=True)
@@ -117,3 +117,62 @@ class LoginForm(forms.Form):
                   label='',  # Explicitly remove the label from crispy form
                   ),
         )
+
+
+
+
+class UserGameProgressForm(forms.ModelForm):
+    tools_earned = forms.CharField(
+    widget=forms.Textarea(attrs={
+        'class': 'auth-form-control json-field',
+        'placeholder': 'Enter as comma-separated values, e.g. hammer,wrench,screwdriver'
+    }),
+    required=False
+    )
+    
+    badges = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'auth-form-control json-field',
+            'placeholder': 'Enter as comma-separated values, e.g. fast_learner,energy_saver'
+        }),
+        required=False
+    )
+    
+    super_powers = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'auth-form-control json-field',
+            'placeholder': 'Enter as comma-separated values, e.g. xray_vision,time_travel'
+        }),
+        required=False
+    )
+    class Meta:
+        model = UserGameProgress
+        fields = ['level', 'attempt_number', 'task_number', 'completion_status', 
+                'points_scored', 'time_taken', 'max_points', 'hint_penalty_points',
+                'bonus_points', 'tools_earned', 'badges', 'super_powers']
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        # Apply auth-form-control class to all fields
+        if self.instance and self.instance.pk:
+            for field in ['tools_earned', 'badges', 'super_powers']:
+                if getattr(self.instance, field):
+                    self.initial[field] = ', '.join(getattr(self.instance, field))
+        
+        # Apply auth-form-control to all fields
+        for field_name, field in self.fields.items():
+            if field_name not in ['tools_earned', 'badges', 'super_powers']:
+                field.widget.attrs.update({'class': 'auth-form-control'})
+        
+        def clean(self):
+            cleaned_data = super().clean()
+            
+            # Convert comma-separated strings back to lists
+            for field in ['tools_earned', 'badges', 'super_powers']:
+                if cleaned_data.get(field):
+                    items = [item.strip() for item in cleaned_data[field].split(',') if item.strip()]
+                    cleaned_data[field] = items
+            
+            return cleaned_data
