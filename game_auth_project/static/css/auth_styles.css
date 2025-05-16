@@ -1,3 +1,85 @@
+/*base styles */
+body {
+  background-image: url("../images/buildingbg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  background-image: url("/static/images/logo_pl.png");
+  width: 371px;
+  height: 227px;
+  background-size: cover;
+}
+
+.auth-container {
+  background-color: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  min-height: 100vh;
+  /* This is the key fix */
+  margin: 0 auto;
+  width: 80%;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.login-container {
+  width: 40%;
+}
+
+.welcomeText {
+  display: flex;
+  align-items: initial;
+  justify-content: space-evenly;
+  flex-direction: column;
+  max-height: 100%;
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.logo h1 {
+  font-weight: bold;
+  color: #17ff8b;
+  font-size: 46px !important;
+}
+
+.logo p {
+  color: #ffffff;
+  font-style: italic;
+}
+
+.form-control {
+  border-radius: 5px;
+  padding: 12px;
+}
+
+.btn-primary {
+  background-color: #3498db;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.auth-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/*end base styles */
+
 .auth-form-control {
   background: rgba(0, 0, 0, 0.8);
   border: 2px solid #ffffff55;
@@ -6,7 +88,7 @@
   padding: 10px 15px;
   width: 100%;
   margin-bottom: 15px;
-  height: 50px;
+  height: 40px;
 }
 
 .auth-form-control::placeholder {
@@ -161,133 +243,54 @@
   }
 }
 
-#id_remember,
-#id_remember+label {
-  display: none !important;
+
+/* Add any video styles here */
+.video-login-container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
-#id_password1_helptext {
-  color: #ffffff88;
-}
-
-
-/* Add to your existing CSS */
-.container {
-  max-width: 100%;
+#video-container {
+  width: 800px;
+  height: auto;
+  position:absolute;
   margin: 0 auto;
-  padding: 20px;
+  transition: opacity 1s ease-in-out;
 }
 
-.form-group {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-input,
-select,
-textarea {
+#login-container {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 1s ease-in-out;
+  z-index: 10;
+  flex-direction: column;
 }
 
-.json-input {
-  font-family: monospace;
-  min-height: 100px;
-}
-
-.is-valid {
-  border-color: #28a745;
-}
-
-.is-invalid {
-  border-color: #dc3545;
-}
-
-.json-input:focus.is-valid {
-  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-}
-
-.json-input:focus.is-invalid {
-  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-}
-
-/* Progress Table Styles */
-.table-responsive {
-  overflow-x: auto;
-  margin-bottom: 20px;
-}
-
-.table {
+.login-content {
+   padding: 2rem;
+  border-radius: 10px;
   width: 100%;
-  margin-bottom: 1rem;
-  color: #212529;
-  border-collapse: collapse;
+  max-width: 400px;
+
 }
 
-.table th {
-  vertical-align: bottom;
-  border-bottom: 2px solid #dee2e6;
-  background-color: #343a40;
-  color: white;
-  padding: 12px;
-  text-align: left;
+.fullscreen-video {
+  width: 800px;
+  height: auto;
+  object-fit: cover;
 }
 
-.table td {
-  padding: 12px;
-  vertical-align: top;
-  border-top: 1px solid #dee2e6;
+/* State classes */
+.active {
+  opacity: 1 ;
+  visibility: visible;
 }
 
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-.table-bordered {
-  border: 1px solid #dee2e6;
-}
-
-.table-bordered th,
-.table-bordered td {
-  border: 1px solid #dee2e6;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.leaderboard-table {
-  margin-top: 20px;
-}
-
-.leaderboard-table th {
-  position: sticky;
-  top: 0;
-  background-color: #343a40;
-  color: white;
-}
-
-.leaderboard-table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.leaderboard-table tr:hover {
-  background-color: #e9ecef;
-}
-
-.rank-cell {
-  font-weight: bold;
-  text-align: center;
-}
-
-.points-cell {
-  font-weight: bold;
-  color: #28a745;
+.hidden {
+  opacity: 0 ;
+  visibility: hidden;
 }
