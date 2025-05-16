@@ -1,16 +1,21 @@
-{% extends "base.html" %}  {% load static %} {% load crispy_forms_tags %} {% block content %}
+{% extends "base.html" %} {% load static %} {% block title %}Register{% endblock %}{% load crispy_forms_tags %} {% block content %}
 <div class="signup-container">
-  <h1 class="auth-title">Sign Up</h1>
-
-  <form method="POST" action="{% url 'account_signup' %}">
-    {% csrf_token %} {{ form|crispy }}
-
-    <div class="auth-btn-container">
-      <a href="{% url 'account_login' %}" class="auth-link"
-        >Already have an account? Login</a
-      >
-      <button type="submit" class="auth-btn">Sign Up</button>
+  <div class="logo-container ">
+    <div class="logo top-right-logo">
     </div>
-  </form>
+
+  </div>
+  <div class="signup-content">
+    <h1 class="auth-title">Register</h1>
+
+    <form method="POST" action="{% url 'account_signup' %}">
+      {% csrf_token %} {{ form|crispy }}
+
+      <div class="auth-btn-container">
+        <a href="{% url 'account_login' %}" class="auth-link">Already have an account? Login</a>
+        <button type="submit" class="auth-btn">Register</button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

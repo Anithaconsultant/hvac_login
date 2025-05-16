@@ -1,11 +1,14 @@
 {% extends "base.html" %} {% block content %}
 <div class="container  d-flex justify-content-center vh-100">
+  <div class="logo-container ">
+    <div class="logo top-right-logo"></div>
+  </div>
   <div  style="max-width: 500px; width: 100%">
     <h2 class="mb-3 text-center" style="color: #fff">Confirm Your Email</h2>
 
     {% if confirmation %}
-    <p class="text-center">
-      Hi <strong>{{ confirmation.email_address.user.username }}</strong>, click
+    <p class="text-center" style="color: #ffffffa8">
+      Hi <strong>{{ confirmation.email_address.user.nickname }}</strong>, click
       the button below to confirm your email address.
     </p>
     <div class="text-center">

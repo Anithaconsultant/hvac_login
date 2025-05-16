@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
-from allauth.account.views import EmailVerificationSentView
+from allauth.account.views import EmailVerificationSentView,LoginView
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.http import JsonResponse, Http404, FileResponse
@@ -20,13 +20,21 @@ import os,json
 from django.conf import settings
 from rest_framework.decorators import api_view
 from django.db.models import Sum, Max
+from django.contrib.auth import login as auth_login
 
 
-def redirect_view(request):
+def home_redirect(request):
+    """Redirect root URL to appropriate location"""
     if request.user.is_authenticated:
-        return redirect('home')  # go to home page
-    else:
-        return redirect('account_login')  # go to login page
+        return redirect('home')  # Goes to the actual home view
+    return redirect('account_login')  # Goes to allauth login
+
+def home_view(request):
+    """Actual home page view"""
+    if not request.user.is_authenticated:
+        return redirect('account_login')
+    return render(request, 'home.html')  # Your actual home template
+
 
 
 class CustomEmailVerificationSentView(TemplateView):
@@ -92,8 +100,13 @@ def update_game_progress(request):
                         status=400
                     )
                 
-                user = CustomUser.objects.get(pk=data['user_id'])
-                print(user)
+                try:
+                    user = CustomUser.objects.get(pk=data['user_id'])
+                except CustomUser.DoesNotExist:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'Invalid user_id'
+                    }, status=400)
                 progress = UserGameProgress.objects.get(
                     user=user,
                     level=data.get('level'),
@@ -135,7 +148,6 @@ def update_game_progress(request):
             user=request.user
         ).order_by('level', 'attempt_number', 'task_number').first()
         
-        print("Existing record:", existing_record)  # Debugging line
         
         if existing_record:
             record_data = {
@@ -226,3 +238,6 @@ def leaderboard(request):
             # ))
 
     return render(request, 'leaderboard.html', {'leaderboard_data': leaderboard_data})
+
+
+

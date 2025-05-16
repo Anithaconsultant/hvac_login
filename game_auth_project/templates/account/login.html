@@ -1,61 +1,92 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load widget_tweaks %}
-
+{% load static %}
+{% block title %}Login{% endblock %}
 {% block content %}
-<div class="login-container">
-  <h1 class="auth-title">Login</h1>
+<div class="video-login-container">
+  <!-- Video Player (Initially visible) -->
 
-  {% if form.errors %}
-    <div class="alert alert-danger">
-      {% for field, errors in form.errors.items %}
-        {% for error in errors %}
-          {% if field == '__all__' %}
-            <p>{{ error }}</p>
-          {% else %}
-            <p>{{ field|title }}: {{ error }}</p>
-          {% endif %}
-        {% endfor %}
-      {% endfor %}
-    </div>
-  {% endif %}
+  <div id="video-container" class="active">
+    <video id="intro-video" autoplay muted class="fullscreen-video" width="800" height="auto">
+      <source src="{% static 'video/logo_animation.mp4' %}" type="video/mp4">
+      Your browser does not support HTML5 video.
+    </video>
+  </div>
 
-  {% if messages %}
-    <div class="alert alert-info">
-      {% for message in messages %}
-        <p>{{ message }}</p>
-      {% endfor %}
+  <!-- Login Form (Initially hidden) -->
+  <div id="login-container" class="hidden">
+    <div class="welcomeText">
+      <div class="logo">
+      </div>
+      <p style="color:#ffffff94 ">An immersive and exploratory learning experience</p>
     </div>
-  {% endif %}
+    <div class="login-content">
+      <h1 class="auth-title">Login</h1>
+      
+      <div>
 
-  <form method="POST" action="{% url 'account_login' %}">
-    {% csrf_token %}
-    
-    <div class="form-group">
-      {{ form.login|add_class:"auth-form-control"|attr:"placeholder:Email or Username" }}
-      {% if form.login.errors %}
-        <div class="text-danger small">{{ form.login.errors }}</div>
-      {% endif %}
-    </div>
-    
-    <div class="form-group">
-      {{ form.password|add_class:"auth-form-control"|attr:"placeholder:Password" }}
-      {% if form.password.errors %}
-        <div class="text-danger small">{{ form.password.errors }}</div>
-      {% endif %}
-    </div>
-    
-    <div class="form-group form-check">
-      {{ form.remember }}
-      <label class="form-check-label" for="{{ form.remember.id_for_label }}">Remember me</label>
-    </div>
-    
-    <button type="submit" class="auth-btn">Login</button>
-  </form>
+        <form method="POST" action="{% url 'account_login' %}">
+          {% csrf_token %}
 
-  <div class="auth-btn-container">
-    <a href="{% url 'account_signup' %}" class="auth-link">Sign Up</a>
-    <a href="{% url 'account_reset_password' %}" class="auth-link">Forgot Password?</a>
+          <div class="form-group">
+            {{ form.login|add_class:"auth-form-control"|attr:"placeholder:Email or Username" }}
+            {% if form.login.errors %}
+            <div class="text-danger small">{{ form.login.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            {{ form.password|add_class:"auth-form-control"|attr:"placeholder:Password" }}
+            {% if form.password.errors %}
+            <div class="text-danger small">{{ form.password.errors }}</div>
+            {% endif %}
+          </div>
+
+
+          <div class="auth-btn-container">
+            <a href="{% url 'account_signup' %}" class="auth-link"
+              style="margin-top:5px;font-size:20px;font-weight:bold;">Register</a>
+            <button type="submit" class="auth-btn loginbtn">Login</button>
+          </div>
+
+          <a href="{% url 'account_reset_password' %}" class="auth-link" style="float:right;margin-top:10px;">Forgot
+            Password?</a>
+        </form>
+
+      </div>
+    </div>
+
   </div>
 </div>
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const video = document.getElementById('intro-video');
+    const videoContainer = document.getElementById('video-container');
+    const loginContainer = document.getElementById('login-container');
+
+    // When video ends
+    video.addEventListener('ended', function () {
+      videoContainer.classList.remove('active');
+      videoContainer.classList.add('hidden');
+
+      loginContainer.classList.remove('hidden');
+      loginContainer.classList.add('active');
+    });
+
+    // Skip button functionality (optional)
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.key === ' ') {
+        video.pause();
+        videoContainer.classList.remove('active');
+        videoContainer.classList.add('hidden');
+        loginContainer.classList.remove('hidden');
+        loginContainer.classList.add('active');
+      }
+    });
+  });
+</script>
 {% endblock %}

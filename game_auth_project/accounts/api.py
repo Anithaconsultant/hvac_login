@@ -95,8 +95,12 @@ class ClientLoginView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
+        try:
+            user = User.objects.get(email=username)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not registered.'}, status=status.HTTP_404_NOT_FOUND)
 
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, email=username, password=password)
 
         if user is not None:
             if user.is_active:
@@ -106,8 +110,9 @@ class ClientLoginView(APIView):
                     'status': 'success',
                     'user_id': user.id,
                     'email': user.email,
+                    'username':user.nickname,
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({'detail': 'User account is disabled.'}, status=status.HTTP_403_FORBIDDEN)
         else:
-            return Response({'detail': 'Invalid username or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'detail': 'Invalid password.'}, status=status.HTTP_401_UNAUTHORIZED)

@@ -1,0 +1,15 @@
+Hi {{ email }},
+
+You're receiving this email because someone attempted to register an account on Phantom Loads using your email address: {{ email }}.
+
+However, an account with this email already exists.
+
+If you forgot your password, you can reset it here:
+{{ password_reset_url }}
+
+If you didn't request this, you can safely ignore the email.
+
+For any questions or support, please contact us at: support@phantom-load.in
+
+
+Thank you for using Phantom Loads!

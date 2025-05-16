@@ -192,8 +192,11 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'
+SITE_NAME = "Phantomload" 
 
-LOGIN_REDIRECT_URL = 'home'
+
+LOGIN_REDIRECT_URL = '/home'
 LOGOUT_REDIRECT_URL = 'account_login'
 
 # Crispy Forms
@@ -207,14 +210,17 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # For production
 EMAIL_HOST = 'smtp.gmail.com'  # Or your SMTP server
 EMAIL_PORT = 587  # For TLS
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'anitha@iihs.ac.in'  # Your email address
+EMAIL_HOST_USER = 'support@phantom-load.in'  # Your email address
 # App password (not your regular password)
-EMAIL_HOST_PASSWORD = 'damp juba juhy bbva'
-DEFAULT_FROM_EMAIL = 'anitha@iihs.ac.in'  # Default sender address
-SERVER_EMAIL = 'anitha@iihs.ac.in'  # For error messages
+EMAIL_HOST_PASSWORD = 'jayt wswx zjqr onwx'
+DEFAULT_FROM_EMAIL = 'support@phantom-load.in'  # Default sender address
+SERVER_EMAIL = 'support@phantom-load.in'  # For error messages
 
 
-ACCOUNT_EMAIL_SUBJECT_PREFIX = 'www.hvac3dgame.com '
+ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Phantom Loads - '
+ACCOUNT_EMAIL_VERIFICATION_SUBJECT = 'Verify your email address'
+ACCOUNT_EMAIL_CONFIRMATION_HTML_TEMPLATE = "account/email/email_confirmation_message.html"
+
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
 
 

@@ -2,9 +2,65 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import CustomUser,UserGameProgress
 from allauth.account.forms import SignupForm
+from django.utils.safestring import mark_safe
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field
 import json
+
+# class CustomUserCreationForm(SignupForm):
+#     first_name = forms.CharField(max_length=30, required=True)
+#     last_name = forms.CharField(max_length=30, required=True)
+#     nickname = forms.CharField(max_length=30, required=False)
+#     mobile_number = forms.CharField(max_length=20, required=False)
+
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+
+#         for field_name in self.fields:
+#             self.fields[field_name].label = ''
+
+#         self.fields['email'].widget.attrs.update({
+#             'class': 'auth-form-control',
+#             'placeholder': 'Email'
+#         })
+#         self.fields['first_name'].widget.attrs.update({
+#             'class': 'auth-form-control',
+#             'placeholder': 'First Name'
+#         })
+#         self.fields['last_name'].widget.attrs.update({
+#             'class': 'auth-form-control',
+#             'placeholder': 'Last Name'
+#         })
+#         self.fields['nickname'].widget.attrs.update({
+#             'class': 'auth-form-control',
+#             'placeholder': 'Nickname (optional)'
+#         })
+#         self.fields['mobile_number'].widget.attrs.update({
+#             'class': 'auth-form-control',
+#             'placeholder': 'Mobile Number (optional)'
+#         })
+#         self.fields['password1'].widget.attrs.update({
+#             'class': 'auth-form-control',
+#             'placeholder': 'Password'
+#         })
+
+#     def save(self, request):
+#         user = super().save(request)
+#         user.first_name = self.cleaned_data['first_name']
+#         user.last_name = self.cleaned_data['last_name']
+#         user.nickname = self.cleaned_data.get('nickname')
+#         user.mobile_number = self.cleaned_data.get('mobile_number')
+#         user.save()
+#         return user
+
+
+from django import forms
+from allauth.account.forms import SignupForm
+from django.utils.safestring import mark_safe
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 class CustomUserCreationForm(SignupForm):
     first_name = forms.CharField(max_length=30, required=True)
@@ -15,34 +71,51 @@ class CustomUserCreationForm(SignupForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Remove all labels
         for field_name in self.fields:
             self.fields[field_name].label = ''
 
-        self.fields['email'].widget.attrs.update({
+        # Common attributes for all fields
+        common_attrs = {
             'class': 'auth-form-control',
-            'placeholder': 'Email'
-        })
-        self.fields['first_name'].widget.attrs.update({
-            'class': 'auth-form-control',
-            'placeholder': 'First Name'
-        })
-        self.fields['last_name'].widget.attrs.update({
-            'class': 'auth-form-control',
-            'placeholder': 'Last Name'
-        })
-        self.fields['nickname'].widget.attrs.update({
-            'class': 'auth-form-control',
-            'placeholder': 'Nickname (optional)'
-        })
-        self.fields['mobile_number'].widget.attrs.update({
-            'class': 'auth-form-control',
-            'placeholder': 'Mobile Number (optional)'
-        })
-        self.fields['password1'].widget.attrs.update({
-            'class': 'auth-form-control',
-            'placeholder': 'Password'
-        })
+            'autocomplete': 'off'
+        }
 
+        # Update widget attributes
+        field_placeholders = {
+            'email': 'Email',
+            'first_name': 'First Name',
+            'last_name': 'Last Name',
+            'nickname': 'Nickname (optional)',
+            'mobile_number': 'Mobile Number (optional)',
+            'password1': 'Password'
+        }
+
+        for field, placeholder in field_placeholders.items():
+            self.fields[field].widget.attrs.update({
+                **common_attrs,
+                'placeholder': placeholder
+            })
+
+        # Special password field configuration
+        self.fields['password1'].help_text = mark_safe(
+            '<small class="password-help-text">'
+            'Password must contain: '
+            '<ul class="password-requirements">'
+            '<li>At least 8 characters</li>'
+            '<li>1 uppercase letter</li>'
+            '<li>1 lowercase letter</li>'
+            '<li>1 number</li>'
+            '<li>1 special character</li>'
+            '</ul>'
+            '</small>'
+        )
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+        validate_password(password1)  # Will raise ValidationError with all messages
+        return password1
+    
     def save(self, request):
         user = super().save(request)
         user.first_name = self.cleaned_data['first_name']
@@ -51,7 +124,6 @@ class CustomUserCreationForm(SignupForm):
         user.mobile_number = self.cleaned_data.get('mobile_number')
         user.save()
         return user
-
 
 class CustomUserChangeForm(UserChangeForm):
     class Meta:

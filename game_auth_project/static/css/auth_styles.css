@@ -10,10 +10,19 @@ body {
   align-items: center;
 }
 
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* Prevent scroll on entire page */
+}
+
 .logo {
-  background-image: url("/static/images/logo_pl.png");
-  width: 371px;
-  height: 227px;
+  background-image: url("../images/logo_pl.png");
+  width: 338px;
+  height: 208px;
   background-size: cover;
 }
 
@@ -32,16 +41,18 @@ body {
   flex-direction: column;
 }
 
-.login-container {
+.login-container,
+.signup-container {
   width: 40%;
 }
 
 .welcomeText {
   display: flex;
-  align-items: initial;
-  justify-content: space-evenly;
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
   max-height: 100%;
+
 }
 
 .logo {
@@ -73,10 +84,7 @@ body {
   width: 100%;
 }
 
-.auth-link {
-  text-align: center;
-  margin-top: 1rem;
-}
+
 
 /*end base styles */
 
@@ -129,7 +137,7 @@ body {
 .auth-link {
   color: #ffffff;
   text-decoration: none;
-  margin-top: 1.5rem;
+  margin-top: 10px;
   display: block;
   text-align: center;
 }
@@ -244,22 +252,41 @@ body {
 }
 
 
+
 /* Add any video styles here */
 .video-login-container {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
 #video-container {
-  width: 800px;
-  height: auto;
-  position:absolute;
-  margin: 0 auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 800px;
+  /* Match your video width */
   transition: opacity 1s ease-in-out;
 }
 
+#video-container video {
+  /*  width: 100%;
+  height: auto;
+  display: block;
+  Remove extra space below video */
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
 #login-container {
+  position: absolute;
+  /* Add absolute positioning */
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   display: flex;
@@ -271,26 +298,203 @@ body {
 }
 
 .login-content {
-   padding: 2rem;
+  padding: 2rem;
   border-radius: 10px;
   width: 100%;
   max-width: 400px;
-
-}
-
-.fullscreen-video {
-  width: 800px;
-  height: auto;
-  object-fit: cover;
 }
 
 /* State classes */
 .active {
-  opacity: 1 ;
+  opacity: 1;
   visibility: visible;
 }
 
 .hidden {
-  opacity: 0 ;
+  opacity: 0;
   visibility: hidden;
+}
+
+/*disabled download button */
+.download-btn.disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+  opacity: 0.65;
+  pointer-events: none;
+  text-decoration: none;
+}
+
+.download-btn.disabled:hover {
+  background-color: #cccccc;
+  color: #666666;
+}
+
+/* Logo positioning */
+.logo-container {
+  position: absolute;
+  top: 5px;
+  right: 140px;
+  z-index: 1000;
+}
+
+.top-right-logo {
+  height: 105px;
+  width: 170px;
+
+}
+
+
+/* Password help text styling */
+.password-help-text {
+  color: #ffffffa8;
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.password-requirements {
+  margin: 0.25rem 0 0 1rem;
+  padding-left: 1rem;
+}
+
+.password-requirements li {
+  list-style-type: disc;
+  line-height: 1.4;
+}
+
+/* Error message styling */
+.errorlist {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.justify-content-center {
+  align-items: center !important;
+}
+
+.btn-primary {
+
+  background: #555;
+  border: 2px solid #9d9d9c;
+  display: flex;
+  color: #ffffff;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0;
+  font-weight: bold;
+  margin-left: auto;
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: #666 !important;
+  border-color: #ffffff88;
+}
+
+
+/* MEdia Queries */
+@media (max-width: 575.98px) {
+  body {
+    overflow: auto;
+  }
+
+  .logo {
+    width: 193px;
+    height: 120px;
+
+  }
+
+  .welcomeText p {
+    font-size: 12px;
+  }
+
+  .login-content {
+    width: 80% !important;
+  }
+
+  .logo-container {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 1000;
+  }
+
+  .top-right-logo {
+    height: 71px;
+    width: 116px;
+  }
+
+  .auth-btn:not(.loginbtn) {
+    margin: 0 auto;
+  }
+
+  .signup-container {
+    width: 100%;
+  }
+
+  .home-container {
+    padding: 5px;
+
+  }
+
+  .hero-section {
+    margin-bottom: 0;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  body {
+    overflow: auto;
+  }
+
+  .logo {
+    width: 193px;
+    height: 120px;
+
+  }
+
+  .forgotlink {
+    margin-right: 10px;
+  }
+
+  .welcomeText p {
+    font-size: 12px;
+  }
+
+  .login-content {
+    width: 70% !important;
+  }
+
+  .logo-container {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 1000;
+  }
+
+  .top-right-logo {
+    height: 71px;
+    width: 116px;
+  }
+
+  .auth-btn:not(.loginbtn) {
+    margin: 0 auto;
+  }
+
+  .signup-container {
+    width: 100%;
+  }
+
+  .home-container {
+    padding: 5px;
+
+  }
+
+  .hero-section {
+    margin-bottom: 0;
+  }
+
+
 }
