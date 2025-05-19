@@ -1,4 +1,3 @@
-Hi {{ email }},
 
 Thank you for registering on Phantomload!!!
 
@@ -10,7 +9,6 @@ If you did not register, please ignore this email.
 
 For any questions or support, please contact us at: support@phantom-load.in
 
-Best regards,  
-
-The Phantomload Game Team  
+Best Regards, 
+Team Phantom Load
 

@@ -1,15 +1,3 @@
-/*base styles */
-body {
-  background-image: url("../images/buildingbg.jpg");
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  height: 100%;
-  margin: 0;
-  display: flex;
-  align-items: center;
-}
-
 html,
 body {
   height: 100%;
@@ -17,7 +5,19 @@ body {
   padding: 0;
   overflow: hidden;
   /* Prevent scroll on entire page */
+  background-image: url("../images/buildingbg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
+
+.main-container {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+}
+
 
 .logo {
   background-image: url("../images/logo_pl.png");
@@ -34,6 +34,7 @@ body {
   /* This is the key fix */
   margin: 0 auto;
   width: 80%;
+  max-width: 100%;
   display: flex;
   overflow: hidden;
   align-items: center;
@@ -158,12 +159,34 @@ body {
   height: 35px;
 }
 
-.home-container {
+.home-container,
+.about-container,
+.credit-container,
+.leaderboard-container,
+.progress-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
-  color: white;
-  text-align: center;
+  color: #ffffff99;
+  min-height: 100vh;
+  position: relative;
+}
+
+.leaderboard-container,
+.progress-container {
+  max-width: 100%;
+  width: 100%;
+}
+
+.profile-container {
+  width: 800px;
+  height: 601px;
+  display: flex;
+  color: #ffffff99;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
 
 .hero-section {
@@ -176,7 +199,7 @@ body {
 .hero-title {
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: #ffffff55;
+  color: #ffffff99;
 }
 
 .hero-description {
@@ -201,6 +224,7 @@ body {
   justify-content: center;
   gap: 20px;
   flex-wrap: wrap;
+  margin-top: 10px;
 }
 
 .download-btn {
@@ -232,6 +256,119 @@ body {
 .download-btn i {
   margin-right: 10px;
   font-size: 1.2rem;
+}
+
+.hamburger-menu {
+  position: absolute;
+  left: 146px;
+  top: 0px;
+  z-index: 1000;
+}
+
+.homeicon {
+  position: absolute;
+  left: 17px;
+  top: 34px;
+}
+
+.hamburger-icon {
+  cursor: pointer;
+  padding: 10px;
+  display: inline-block;
+}
+
+.hamburger-icon span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  margin: 5px 0;
+  background-color: #c2c0c0;
+  transition: all 0.3s ease;
+}
+
+.menu-items {
+  display: none;
+  position: absolute;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.9);
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: 5px;
+  border: 1px solid #ffffff88;
+}
+
+.menu-items a {
+  color: #ffffff88;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.menu-items a:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #000000;
+}
+
+.show {
+  display: block;
+}
+
+/* Hamburger animation */
+.hamburger-icon.change span:nth-child(1) {
+  transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger-icon.change span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-icon.change span:nth-child(3) {
+  transform: rotate(45deg) translate(-5px, -6px);
+}
+
+
+::-webkit-scrollbar {
+  width: 4px;
+  /* Makes scrollbar thinner */
+  height: 4px;
+  /* For horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+  /* Black track */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  /* Grey thumb */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+  /* Darker grey on hover */
+}
+
+/* For Firefox */
+html {
+  scrollbar-width: thin;
+  /* Makes scrollbar thinner */
+  scrollbar-color: #888 #000;
+  /* thumb track */
+}
+
+/* For Internet Explorer */
+body {
+  scrollbar-face-color: #888;
+  /* Grey thumb */
+  scrollbar-track-color: #000;
+  /* Black track */
+  scrollbar-arrow-color: #000;
+  /* Black arrows */
+  scrollbar-width: thin;
 }
 
 /* Responsive adjustments */
@@ -339,8 +476,8 @@ body {
 }
 
 .top-right-logo {
-  height: 105px;
-  width: 170px;
+  height: 78px;
+  width: 125px;
 
 }
 
@@ -393,6 +530,32 @@ body {
   border-color: #ffffff88;
 }
 
+.credit-team {
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
+
+}
+
+.credits-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.credits-section p {
+  text-align: left;
+}
+
+.credits-section ul {
+  padding-left: 0px;
+}
 
 /* MEdia Queries */
 @media (max-width: 575.98px) {
@@ -426,12 +589,52 @@ body {
     width: 116px;
   }
 
-  .auth-btn {
+  .auth-btn:not(.loginbtn) {
     margin: 0 auto;
   }
 
   .signup-container {
     width: 100%;
+  }
+
+  .home-container {
+    padding: 5px;
+
+  }
+
+  .hero-section {
+    margin-bottom: 0;
+  }
+
+  .hamburger-menu {
+    left: 5px;
+  }
+
+  .home-container,
+  .about-container,
+  .credit-container,
+  .leaderboard-container,
+  .progress-container {
+    padding: 5px;
+    margin-top: 65px;
+  }
+
+  .profile-container .homeicon {
+    left: 4px;
+    top: -87px;
+  }
+
+  .profile-container {
+    width: 100%;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .homeicon {
+    left: -6px;
+    top: -4px;
   }
 }
 
@@ -470,14 +673,45 @@ body {
     width: 116px;
   }
 
-  .auth-btn {
+  .auth-btn:not(.loginbtn) {
     margin: 0 auto;
   }
 
   .signup-container {
     width: 100%;
   }
-   .forgotlink {
-    margin-right: 10px;
+
+  .home-container {
+    padding: 5px;
+
   }
+
+  .hero-section {
+    margin-bottom: 0;
+  }
+
+  .hamburger-menu {
+    left: 5px;
+  }
+
+  .about-container,
+  .credit-container {
+    padding: 5px;
+  }
+
+  .home-container,
+  .about-container,
+  .credit-container,
+  .leaderboard-container,
+  .progress-container,
+  .profile-container {
+    padding: 5px;
+    margin-top: 65px;
+  }
+
+  .homeicon {
+    left: -6px;
+    top: -4px;
+  }
+
 }

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="logo-container ">
+    <div class="logo top-right-logo"></div>
+</div>
+
+<div class=" about-container">
+
+    <div class="homeicon">
+        <a href="{% url 'home' %}" style="text-decoration: none;">
+            <div style="display: inline-block; margin: 10px; cursor: pointer;" title="Home">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z"
+                        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M9 22V12H15V22" stroke="white" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+        </a>
+    </div>
+    <div class="about-content">
+        <h1 style="text-align: center;">About Us</h1>
+        <div class=" text-content">
+            <p>With the rapid rise in global energy consumption, decarbonizing and reducing energy waste in buildings is
+                critical.
+                This requires an in-depth understanding of interactions between building systems such as envelope,
+                activities
+                and plug
+                loads, lighting, and air-conditioning design. It requires awareness of hidden or unnoticed energy
+                drains,
+                often
+                referred
+                to as latent or phantom loads. These silently consume power and are frequently overlooked. Addressing
+                such
+                inefficiencies can lead to significant energy savings.
+            </p>
+            <p>
+                These are often taught as theoretical subjects in academic curricula, with little emphasis on real-world
+                application. As
+                a result, students often graduate without practical knowledge of how building systems interact and
+                struggle
+                to
+                solve
+                operational issues effectively.</p>
+            <p>
+                Phantom Load, an interactive 3D computer game set in a realistic building environment, allows learners
+                to
+                explore
+                rooms, audit energy use, investigate HVAC systems, trace ductwork and piping, and make design or
+                operational
+                changes to
+                improve thermal comfort and energy performance.</p>
+            <p>
+                The game will have three levels.<br />
+                Level 1: Basic - Building Audit Mode<br />
+                Level 2: Intermediate - Troubleshooting Mode<br />
+                Level 3: Advanced – Performance Optimization Mode<br /></p>
+            <p>
+                The pre-alpha version being exhibited today includes a sub-set of Level-1. Development of this learning
+                game
+                will
+                continue in an accelerated manner from now on. Watch this space for further updates.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

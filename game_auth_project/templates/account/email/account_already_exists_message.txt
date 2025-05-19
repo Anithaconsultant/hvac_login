@@ -1,4 +1,3 @@
-Hi {{ email }},
 
 You're receiving this email because someone attempted to register an account on Phantom Loads using your email address: {{ email }}.
 
@@ -11,5 +10,5 @@ If you didn't request this, you can safely ignore the email.
 
 For any questions or support, please contact us at: support@phantom-load.in
 
-
-Thank you for using Phantom Loads!
+Best Regards, 
+Team Phantom Load

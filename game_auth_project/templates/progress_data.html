@@ -2,54 +2,104 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="logo-container ">
+<div class="logo-container ">
     <div class="logo top-right-logo"></div>
-  </div>
-    <div class="mb-3">
-        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+</div>
+<div class="progress-container ">
+
+    <div class="homeicon">
+        <a href="{% url 'home' %}" style="text-decoration: none;">
+            <div style="display: inline-block; margin: 10px; cursor: pointer;" title="Home">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z"
+                        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M9 22V12H15V22" stroke="white" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+        </a>
     </div>
-    <p class="mb-4 text-center" style="color:#fff;font-size:26px">My Game Progress</p>
-    
-    <div class="table-responsive" style="height:490px;overflow:auto;">
-        <table class="table table-striped table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Level</th>
-                    <th>Attempt</th>
-                    <th>Task</th>
-                    <th>Status</th>
-                    <th>Points</th>
-                    <th>Max Points</th>
-                    <th>Time Taken</th>
-                    <th>Tools Earned</th>
-                    <th>Badges</th>
-                    <th>Super Powers</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for progress in progress_data %}
-                    {% if progress.points_scored is not None %}  <!-- Only show rows with points -->
-                    <tr>
-                        <td>{{ progress.level }}</td>
-                        <td>{{ progress.attempt_number }}</td>
-                        <td>{{ progress.task_number }}</td>
-                        <td>{{ progress.get_completion_status_display }}</td>
-                        <td>{{ progress.points_scored }}</td>
-                        <td>{{ progress.max_points }}</td>
-                        <td>{{ progress.time_taken }}</td>
-                        <td>{{ progress.tools_earned|default:"-" }}</td>
-                        <td>{{ progress.badges|default:"-" }}</td>
-                        <td>{{ progress.super_powers|default:"-" }}</td>
-                    </tr>
-                    {% endif %}
-                {% empty %}
-                <tr>
-                    <td colspan="10" class="text-center">No progress data found</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="progress-content">
+        <h1 style="text-align: center;">Game Progress</h1>
+        <div class="leadertable-content">
+            <div class="data-table-container progress-table">
+                <table class="data-table">
+                    <thead class="leaderboard-header">
+                        <tr>
+                            <th class="col-rank">Level</th>
+                            <th class="col-attempt">Attempt</th>
+                            <th class="col-task">Task</th>
+                            <th class="col-status">Status</th>
+                            <th class="col-points">Points</th>
+                            <th class="col-max-points">Max Points</th>
+                            <th class="col-time">Time Taken</th>
+                            <th class="col-tools">Tools Earned</th>
+                            <th class="col-badges">Badges</th>
+                            <th class="col-powers">Super Powers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for progress in progress_data %}
+                        {% if progress.points_scored is not None %}
+                        <tr class="data-row">
+                            <td class="cell-rank">{{ progress.level }}</td>
+                            <td class="cell-attempt">{{ progress.attempt_number }}</td>
+                            <td class="cell-task">{{ progress.task_number }}</td>
+                            <td class="cell-status">
+                                <span class="status-badge status-{{ progress.completion_status|lower }}">
+                                    {{ progress.get_completion_status_display }}
+                                </span>
+                            </td>
+                            <td class="cell-points">{{ progress.points_scored }}</td>
+                            <td class="cell-max-points">{{ progress.max_points }}</td>
+                            <td class="cell-time">{{ progress.time_taken|default:"-" }}</td>
+                            <td class="cell-tools">
+                                {% if progress.tools_earned %}
+                                <div class="items-container">
+                                    {% for tool in progress.tools_earned.split %}
+                                    <span class="item-badge tool-badge">{{ tool }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td class="cell-badges">
+                                {% if progress.badges %}
+                                <div class="items-container">
+                                    {% for badge in progress.badges.split %}
+                                    <span class="item-badge badge-badge">{{ badge }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td class="cell-powers">
+                                {% if progress.super_powers %}
+                                <div class="items-container">
+                                    {% for power in progress.super_powers.split %}
+                                    <span class="item-badge power-badge">{{ power }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% empty %}
+                        <tr>
+                            <td colspan="10" class="empty-message">
+                                <i class="fas fa-clipboard-list"></i> No progress data found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

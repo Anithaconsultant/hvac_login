@@ -217,7 +217,7 @@ DEFAULT_FROM_EMAIL = 'support@phantom-load.in'  # Default sender address
 SERVER_EMAIL = 'support@phantom-load.in'  # For error messages
 
 
-ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Phantom Loads - '
+ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Phantom Load - '
 ACCOUNT_EMAIL_VERIFICATION_SUBJECT = 'Verify your email address'
 ACCOUNT_EMAIL_CONFIRMATION_HTML_TEMPLATE = "account/email/email_confirmation_message.html"
 

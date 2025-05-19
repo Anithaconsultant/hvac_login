@@ -1,15 +1,3 @@
-/*base styles */
-body {
-  background-image: url("../images/buildingbg.jpg");
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  height: 100%;
-  margin: 0;
-  display: flex;
-  align-items: center;
-}
-
 html,
 body {
   height: 100%;
@@ -17,7 +5,19 @@ body {
   padding: 0;
   overflow: hidden;
   /* Prevent scroll on entire page */
+  background-image: url("../images/buildingbg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
+
+.main-container {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+}
+
 
 .logo {
   background-image: url("../images/logo_pl.png");
@@ -34,6 +34,7 @@ body {
   /* This is the key fix */
   margin: 0 auto;
   width: 80%;
+  max-width: 100%;
   display: flex;
   overflow: hidden;
   align-items: center;
@@ -158,12 +159,38 @@ body {
   height: 35px;
 }
 
-.home-container {
-  max-width: 800px;
+.home-container,
+.about-container,
+.credit-container,
+.leaderboard-container,
+.progress-container {
+  max-width: 100%;
   margin: 0 auto;
   padding: 2rem;
-  color: white;
-  text-align: center;
+  color: #ffffff99;
+  min-height: 100vh;
+  position: relative;
+}
+
+.leadertable-content {
+  height: 500px;
+  overflow: auto;
+  width: 100%;
+
+  margin: 20px;
+
+}
+
+.profile-container {
+  width: 800px;
+  max-width: 100%;
+  height: 601px;
+  display: flex;
+  color: #ffffff99;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
 
 .hero-section {
@@ -173,10 +200,19 @@ body {
   border-radius: 10px;
 }
 
+.text-content {
+  height: 500px;
+  overflow: auto;
+  width: 100%;
+  padding: 10px 20px;
+  margin: 20px;
+}
+
+
 .hero-title {
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: #ffffff55;
+  color: #ffffff99;
 }
 
 .hero-description {
@@ -201,6 +237,7 @@ body {
   justify-content: center;
   gap: 20px;
   flex-wrap: wrap;
+  margin-top: 10px;
 }
 
 .download-btn {
@@ -233,6 +270,405 @@ body {
   margin-right: 10px;
   font-size: 1.2rem;
 }
+
+.hamburger-menu {
+  position: absolute;
+  left: 146px;
+  top: 0px;
+  z-index: 1000;
+}
+
+.homeicon {
+  position: absolute;
+  left: 17px;
+  top: 34px;
+}
+
+.hamburger-icon {
+  cursor: pointer;
+  padding: 10px;
+  display: inline-block;
+}
+
+.hamburger-icon span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  margin: 5px 0;
+  background-color: #c2c0c0;
+  transition: all 0.3s ease;
+}
+
+.menu-items {
+  display: none;
+  position: absolute;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.9);
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: 5px;
+  border: 1px solid #ffffff88;
+}
+
+.menu-items a {
+  color: #ffffff88;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.menu-items a:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #000000;
+}
+
+.show {
+  display: block;
+}
+
+/* Hamburger animation */
+.hamburger-icon.change span:nth-child(1) {
+  transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger-icon.change span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-icon.change span:nth-child(3) {
+  transform: rotate(45deg) translate(-5px, -6px);
+}
+
+
+::-webkit-scrollbar {
+  width: 4px;
+  /* Makes scrollbar thinner */
+  height: 4px;
+  /* For horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+  /* Black track */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  /* Grey thumb */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+  /* Darker grey on hover */
+}
+
+/* For Firefox */
+html {
+  scrollbar-width: thin;
+  /* Makes scrollbar thinner */
+  scrollbar-color: #888 #000;
+  /* thumb track */
+}
+
+/* For Internet Explorer */
+body {
+  scrollbar-face-color: #888;
+  /* Grey thumb */
+  scrollbar-track-color: #000;
+  /* Black track */
+  scrollbar-arrow-color: #000;
+  /* Black arrows */
+  scrollbar-width: thin;
+}
+
+/* Leaderboard Table */
+
+/* Table Styles */
+.leaderboard-table {
+  width: 100%;
+  font-size: 0.95rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
+}
+
+/* Header Styles */
+.leaderboard-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.leaderboard-header th {
+  background: #343a40;
+  color: white;
+  border-color: #454d55;
+  padding: 12px 8px;
+  text-align: left;
+}
+
+.leaderboard-header th.rank-col,
+.leaderboard-header th.level-col,
+.leaderboard-header th.time-col,
+.leaderboard-header th.points-col {
+  text-align: center;
+}
+
+/* Column Widths */
+.rank-col {
+  min-width: 60px;
+}
+
+.level-col {
+  min-width: 80px;
+}
+
+.time-col {
+  min-width: 120px;
+}
+
+.points-col {
+  min-width: 100px;
+}
+
+.tools-col {
+  min-width: 120px;
+}
+
+.badges-col {
+  min-width: 120px;
+}
+
+.powers-col {
+  min-width: 140px;
+}
+
+/* Row Styles */
+.leaderboard-row {
+  transition: background-color 0.2s;
+}
+
+.leaderboard-row:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.first-place {
+  background-color: rgba(255, 215, 0, 0.1);
+  font-weight: bold;
+}
+
+.second-place {
+  background-color: rgba(192, 192, 192, 0.05);
+}
+
+.third-place {
+  background-color: rgba(205, 127, 50, 0.05);
+}
+
+/* Cell Styles */
+.leaderboard-table td {
+  padding: 10px 8px;
+  vertical-align: middle;
+  border-top: 1px solid #dee2e6;
+}
+
+.rank-cell,
+.level-cell,
+.time-cell,
+.points-cell {
+  text-align: center;
+}
+
+.time-cell {
+  font-family: monospace;
+}
+
+.points-cell {
+  font-weight: bold;
+  color: #28a745;
+}
+
+/* Badge Styles */
+.rank-badge {
+  display: inline-block;
+  min-width: 28px;
+  padding: 4px 6px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  background: #f8f9fa;
+  color: #212529;
+}
+
+.level-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  background: #007bff;
+  color: white;
+}
+
+.items-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+}
+
+.item-badge {
+  display: inline-block;
+  padding: 3px 6px;
+  border-radius: 10px;
+  font-size: 0.75em;
+}
+
+.tool-badge {
+  background: #17a2b8;
+  color: white;
+}
+
+.badge-badge {
+  background: #28a745;
+  color: white;
+}
+
+.power-badge {
+  background: #dc3545;
+  color: white;
+}
+
+/* Empty State */
+.empty-message {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+}
+
+.empty-message i {
+  margin-right: 8px;
+}
+
+
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+}
+
+.data-table-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.data-table-header th {
+  background-color: #343a40;
+  color: white;
+  padding: 12px 10px;
+  text-align: left;
+  font-weight: 500;
+  border-bottom: 2px solid #1a252f;
+}
+
+.data-row {
+  transition: background-color 0.2s ease;
+}
+
+.data-row:hover {
+  background-color: #f8f9fa;
+}
+
+.data-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+.progress-table .col-rank {
+  width: 6%;
+}
+
+.progress-table .col-attempt {
+  width: 7%;
+}
+
+.progress-table .col-task {
+  width: 6%;
+}
+
+.progress-table .col-status {
+  width: 10%;
+}
+
+.progress-table .col-points {
+  width: 8%;
+}
+
+.progress-table .col-max-points {
+  width: 8%;
+}
+
+.progress-table .col-time {
+  width: 10%;
+}
+
+.progress-table .col-tools {
+  width: 15%;
+}
+
+.progress-table .col-badges {
+  width: 15%;
+}
+
+.progress-table .col-powers {
+  width: 15%;
+}
+
+.progress-table .cell-time {
+  font-family: 'Courier New', monospace;
+  color: #495057;
+}
+
+.progress-table .cell-points {
+  font-weight: bold;
+  color: #28a745;
+}
+
+.progress-table .cell-max-points {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-in_progress {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-not_started {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -339,8 +775,8 @@ body {
 }
 
 .top-right-logo {
-  height: 105px;
-  width: 170px;
+  height: 78px;
+  width: 125px;
 
 }
 
@@ -393,7 +829,107 @@ body {
   border-color: #ffffff88;
 }
 
+.credit-team {
 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
+
+}
+
+.credits-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.credits-section p {
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.credits-section ul {
+  padding-left: 0px;
+}
+.credits-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Credits Grid Layout */
+.credits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.credits-column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Credits Section Styling */
+.credits-section {
+    border-radius: 8px;
+    padding: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.credits-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.credits-section h3 {
+    color: #b1b2b4b4;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e9ecef;
+    font-size: 1.2rem;
+}
+
+/* Team List Styling */
+.team-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.team-list li {
+    padding: 4px 0;
+    color: #8b8b8b;
+    position: relative;
+    padding-left: 20px;
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+.team-list li:before {
+    color: #6c757d;
+    font-size: 1.2rem;
+    position: absolute;
+    left: 0;
+    top: 5px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .credits-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .credits-section {
+        padding: 15px;
+    }
+}
 /* MEdia Queries */
 @media (max-width: 575.98px) {
   body {
@@ -441,6 +977,41 @@ body {
 
   .hero-section {
     margin-bottom: 0;
+  }
+
+  .hamburger-menu {
+    left: 5px;
+  }
+
+  .home-container,
+  .about-container,
+  .credit-container,
+  .leaderboard-container,
+  .progress-container {
+    padding: 5px;
+    margin-top: 65px;
+  }
+
+  .profile-container .homeicon {
+    left: 4px;
+    top: -87px;
+  }
+
+  .profile-container {
+    width: 100%;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .homeicon {
+    left: -6px;
+    top: -4px;
+  }
+
+  .leadertable-content,.text-content {
+    margin: 0;
   }
 }
 
@@ -496,5 +1067,31 @@ body {
     margin-bottom: 0;
   }
 
+  .hamburger-menu {
+    left: 5px;
+  }
 
+  .about-container,
+  .credit-container {
+    padding: 5px;
+  }
+
+  .home-container,
+  .about-container,
+  .credit-container,
+  .leaderboard-container,
+  .progress-container,
+  .profile-container {
+    padding: 5px;
+    margin-top: 65px;
+  }
+
+  .homeicon {
+    left: -6px;
+    top: -4px;
+  }
+
+  .leadertable-content,.text-content {
+    margin: 0;
+  }
 }

@@ -1,24 +1,33 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Home{% endblock %}
+
 {% block content %}
-<div class="home-container">
-  <div class="logo-container ">
+ <div class="logo-container ">
     <div class="logo top-right-logo"></div>
   </div>
-  <div class="mt-3">
-    <a href="{% url 'account_logout' %}" class="btn btn-danger">Logout</a>
-    <a href="{% url 'view_progress' %}" class="btn btn-info ml-2">View My Progress</a>
-    <a href="{% url 'leaderboard' %}" class="btn btn-warning ml-2">View Leaderboard</a>
-  </div>
+
+<div class="home-container">
+ 
   <div class="hero-section">
-    <h1 class="hero-title">Welcome!</h1>
-    <p class="hero-description">
-      Your mission is to analyze the design and usage patterns of buildings,
-      identify energy-consuming systems, evaluate HVAC system design and
-      operation, and assess building energy performance.
-    </p>
-    <p>Download the executable game and start playing!</p>
+    <h1 class="hero-title" style="text-align: center;">Welcome!</h1>
+    <div class="hero-description" style="text-align: left;">
+      <p> “<b>Phantom Load</b>, an interactive 3D computer game set in a realistic building environment, allows you to
+        explore
+        rooms, audit energy use, investigate HVAC systems, trace ductwork and piping, and make design or operational
+        changes to improve thermal comfort and energy performance.</p>
+      <p>
+        Reducing energy wastage requires awareness of hidden or unnoticed energy drains, often referred to as latent or
+        phantom loads. These silently consume power and are frequently overlooked. Addressing such inefficiencies can
+        lead
+        to significant energy savings.
+      </p>
+      <p> <b>Visit our stall at the project exhibit area for an early peek into Phantom Load!</b></p>
+      Date: 24 May 2025
+      <br />Time: 11:15 - 13:00 hours
+      <br />Place: Project Exhibit Area, Multiplex Food Court
+    </div>
+
     <div class="download-buttons">
       <a href="#" class="download-btn windows-btn disabled" aria-disabled="true">
         <i class="fab fa-windows"></i> Download for Windows

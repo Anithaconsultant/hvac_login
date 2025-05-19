@@ -240,4 +240,11 @@ def leaderboard(request):
     return render(request, 'leaderboard.html', {'leaderboard_data': leaderboard_data})
 
 
+def about(request):
+    return render(request, 'about.html')
 
+def credits(request):
+    return render(request, 'credits.html')
+
+def profile(request):
+    return render(request, 'profile.html')

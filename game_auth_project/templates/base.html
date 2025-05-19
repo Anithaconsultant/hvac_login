@@ -92,12 +92,60 @@
 </head>
 
 <body>
-  <div class="auth-container">
+  <div class="main-container">
+    <div class="hamburger-menu">
+      <div class="hamburger-icon" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="menu-items" id="menuItems">
+        {% if user.is_authenticated %}
+        <!-- Home page menu items -->
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'credits' %}">Credits</a>
+        <a href="{% url 'profile' %}">My Profile</a>
+        <a href="{% url 'view_progress' %}">My Progress</a>
+        <a href="{% url 'leaderboard' %}">Leader Board</a>
+        <a href="{% url 'account_logout'  %}">Logout</a>
+        {% else %}
+        <!-- Non-home page menu items -->
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'credits' %}">Credits</a>
+        {% endif %}
+      </div>
+    </div>
 
-    {% block content %}{% endblock %}
-  </div>
+    <div class="auth-container">
+
+      {% block content %}{% endblock %}
+    </div>
   </div>
 
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('menuItems');
+      const icon = document.querySelector('.hamburger-icon');
+      menu.classList.toggle('show');
+      icon.classList.toggle('change');
+    }
+
+    // Close the menu when clicking outside
+    window.onclick = function (event) {
+      if (!event.target.matches('.hamburger-icon') && !event.target.matches('.hamburger-icon span')) {
+        const menus = document.getElementsByClassName('menu-items');
+        for (let i = 0; i < menus.length; i++) {
+          const openMenu = menus[i];
+          if (openMenu.classList.contains('show')) {
+            openMenu.classList.remove('show');
+          }
+        }
+      }
+    }
+    document.querySelector('.hamburger-icon').addEventListener('click', function () {
+      this.classList.toggle('change');
+    });
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

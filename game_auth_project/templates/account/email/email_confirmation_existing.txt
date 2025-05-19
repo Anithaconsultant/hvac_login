@@ -1,4 +1,3 @@
-Hi {{ email }},
 
 You're receiving this email because someone attempted to register an account on Phantom Loads using your email address: {{ email }}.
 
@@ -9,4 +8,5 @@ If you forgot your password, you can reset it here:
 
 If you didn't request this, you can safely ignore the email.
 
-Thank you for using Phantom Loads!
+Best Regards, 
+Team Phantom Load
