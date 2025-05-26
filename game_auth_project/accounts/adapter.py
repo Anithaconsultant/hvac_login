@@ -18,19 +18,28 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             email = email.lower().strip() if email else email
             if User.objects.filter(email__iexact=email).exists():
                 raise forms.ValidationError(
-                    "This email is already registered. "
-                    "<a href='{}'>Login here</a> or "
-                    "<a href='{}'>reset your password</a>.".format(
-                        reverse('account_login'),
-                        reverse('account_reset_password')
-                    )
+                    "This email is already registered. If you forgot your password, please reset it."
+                    
                 )
         return email
 
-    def send_mail(self, template_prefix, email, context):
-        """
-        Add support email to all outgoing emails
-        """
-        context['support_email'] = 'support@phantom-load.in'
-        context['site_name'] = settings.SITE_NAME
-        return super().send_mail(template_prefix, email, context)
+    # Comment out email sending functionality since we're disabling verification
+    # def send_mail(self, template_prefix, email, context):
+    #     """
+    #     Add support email to all outgoing emails
+    #     """
+    #     context['support_email'] = 'support@phantom-load.in'
+    #     context['site_name'] = settings.SITE_NAME
+    #     return super().send_mail(template_prefix, email, context)
+
+    # Disable email verification requirement
+    def is_open_for_signup(self, request):
+        return True
+
+    # Skip email verification
+    def confirm_email(self, request, email_address):
+        return
+
+    # Don't require email confirmation
+    def get_email_confirmation_url(self, request, emailconfirmation):
+        return

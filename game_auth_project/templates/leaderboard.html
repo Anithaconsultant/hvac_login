@@ -21,7 +21,7 @@
         </a>
     </div>
     <div class="leaderboard-content">
-        <h1 style="text-align: center;">Leaderboard</h1>
+        <h1 style="text-align: center;">Leader Board</h1>
 
         <div class="leadertable-content">
             <table class="leaderboard-table">
@@ -29,8 +29,7 @@
                     <tr class="leaderboard-header">
                         <th class="rank-col">Rank</th>
                         <th class="name-col">Nickname</th>
-                        <th class="level-col">Level</th>
-                        <th class="time-col">Time Taken</th>
+                        <th class="time-col">Time Taken (seconds)</th>
                         <th class="points-col">Net Points</th>
                         <th class="tools-col">Tools Earned</th>
                         <th class="badges-col">Badges</th>
@@ -51,18 +50,18 @@
                             </span>
                         </td>
                         <td class="name-cell">
-                            {{ user.nickname|default:user.username }}
+                            {{ user.nickname|default:user.email }}
                         </td>
-                        <td class="level-cell">
-                            <span class="level-badge">{{ user.max_level|default:"-" }}</span>
-                        </td>
+
                         <td class="time-cell">{{ user.time_taken|default:"-" }}</td>
                         <td class="points-cell">{{ user.total_points|default:0 }}</td>
                         <td class="tools-cell">
                             {% if user.tools_earned %}
                             <div class="items-container">
-                                {% for tool in user.tools_earned.split %}
+                                {% for tool in user.tools_earned_list %}
+                                {% if tool %}
                                 <span class="item-badge tool-badge">{{ tool }}</span>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                             {% else %}
@@ -72,8 +71,11 @@
                         <td class="badges-cell">
                             {% if user.badges %}
                             <div class="items-container">
-                                {% for badge in user.badges.split %}
+
+                                {% for badge in user.badges_list %}
+                                {% if badge %}
                                 <span class="item-badge badge-badge">{{ badge }}</span>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                             {% else %}
@@ -83,8 +85,11 @@
                         <td class="powers-cell">
                             {% if user.super_powers %}
                             <div class="items-container">
-                                {% for power in user.super_powers.split %}
+
+                                {% for power in user.super_powers_list %}
+                                {% if power %}
                                 <span class="item-badge power-badge">{{ power }}</span>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                             {% else %}
@@ -105,4 +110,5 @@
     </div>
 </div>
 </div>
+
 {% endblock %}

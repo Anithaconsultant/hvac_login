@@ -65,7 +65,7 @@ from django.core.exceptions import ValidationError
 class CustomUserCreationForm(SignupForm):
     first_name = forms.CharField(max_length=30, required=True)
     last_name = forms.CharField(max_length=30, required=True)
-    nickname = forms.CharField(max_length=30, required=False)
+    nickname = forms.CharField(max_length=30, required=True)
     mobile_number = forms.CharField(max_length=20, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -86,7 +86,7 @@ class CustomUserCreationForm(SignupForm):
             'email': 'Email',
             'first_name': 'First Name',
             'last_name': 'Last Name',
-            'nickname': 'Nickname (optional)',
+            'nickname': 'Nickname ',
             'mobile_number': 'Mobile Number (optional)',
             'password1': 'Password'
         }
@@ -117,7 +117,7 @@ class CustomUserCreationForm(SignupForm):
         return password1
     
     def save(self, request):
-        user = super().save(request)
+        user = super(SignupForm, self).save(request)
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.nickname = self.cleaned_data.get('nickname')

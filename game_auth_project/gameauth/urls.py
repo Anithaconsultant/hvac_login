@@ -8,6 +8,8 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
+from accounts.views import CustomSignupView
+from allauth.account.views import LoginView
 from accounts import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -18,6 +20,8 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/register/', RegisterView.as_view(), name='register'),
     path('admin/', admin.site.urls),
+    path('accounts/signup/', CustomSignupView.as_view(), name='account_signup'),
+    path('accounts/login/', LoginView.as_view(), name='account_login'),
     path('accounts/confirm-email/', views.CustomEmailVerificationSentView.as_view(),
          name='account_email_verification_sent'),
     path('accounts/', include('allauth.urls')),

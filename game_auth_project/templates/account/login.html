@@ -19,22 +19,22 @@
     <div class="welcomeText">
       <div class="logo">
       </div>
-      <p style="color:#ffffff94 ">An immersive and exploratory learning experience</p>
+      <p style="color:#ffffff94 ">THE HUNT IS ON</p>
     </div>
     <div class="login-content">
       <h1 class="auth-title">Login</h1>
-      
+
       <div>
         {% if form.errors and not form.non_field_errors %}
-          <div class="alert alert-danger" style="display: none;" id="login-error">
-            Invalid username or password. Please try again.
-          </div>
+        <div class="alert alert-danger" style="display: none;" id="login-error">
+          Invalid username or password. Please try again.
+        </div>
         {% elif form.non_field_errors %}
-          <div class="alert alert-danger" style="display: none;" id="login-error">
-            {% for error in form.non_field_errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
+        <div class="alert alert-danger" style="display: none;" id="login-error">
+          {% for error in form.non_field_errors %}
+          {{ error }}
+          {% endfor %}
+        </div>
         {% endif %}
 
         <form method="POST" action="{% url 'account_login' %}" id="login-form">
@@ -60,8 +60,8 @@
             <button type="submit" class="auth-btn loginbtn">Login</button>
           </div>
 
-          <a href="{% url 'account_reset_password' %}" class="auth-link" style="float:right;margin-top:10px;">Forgot
-            Password?</a>
+          <!--a href="{% url 'account_reset_password' %}" class="auth-link" style="float:right;margin-top:10px;">Forgot
+            Password?</a-->
         </form>
 
       </div>

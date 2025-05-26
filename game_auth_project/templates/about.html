@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}About{% endblock %}
 
 {% block content %}
@@ -25,45 +25,38 @@
     <div class="about-content">
         <h1 style="text-align: center;">About Us</h1>
         <div class=" text-content">
-            <p>With the rapid rise in global energy consumption, decarbonizing and reducing energy waste in buildings is
-                critical.
-                This requires an in-depth understanding of interactions between building systems such as envelope,
-                activities
-                and plug
-                loads, lighting, and air-conditioning design. It requires awareness of hidden or unnoticed energy
-                drains,
-                often
-                referred
-                to as latent or phantom loads. These silently consume power and are frequently overlooked. Addressing
-                such
-                inefficiencies can lead to significant energy savings.
+            <h3>What is this?</h3>
+            <p>
+                Phantom Load is an interactive 3D computer game set in a realistic building environment. It will have 3
+                levels of play:</p>
+            <p>
+                Level 1: Building Audit Challenge<br />
+                Level 2: Troubleshooting Challenge<br />
+                Level 3: Performance Optimization Challenge<br /></p>
+            <p>
+                Players explore the building, identify its components and energy use, investigate systems, improve the
+                building performance, and lower carbon emissions.
             </p>
-            <p>
-                These are often taught as theoretical subjects in academic curricula, with little emphasis on real-world
-                application. As
-                a result, students often graduate without practical knowledge of how building systems interact and
-                struggle
-                to
-                solve
-                operational issues effectively.</p>
-            <p>
-                Phantom Load, an interactive 3D computer game set in a realistic building environment, allows learners
-                to
-                explore
-                rooms, audit energy use, investigate HVAC systems, trace ductwork and piping, and make design or
-                operational
-                changes to
-                improve thermal comfort and energy performance.</p>
-            <p>
-                The game will have three levels.<br />
-                Level 1: Basic - Building Audit Mode<br />
-                Level 2: Intermediate - Troubleshooting Mode<br />
-                Level 3: Advanced – Performance Optimization Mode<br /></p>
-            <p>
-                The pre-alpha version being exhibited today includes a sub-set of Level-1. Development of this learning
-                game
-                will
-                continue in an accelerated manner from now on. Watch this space for further updates.</p>
+            <p>The current version is a live demo, a pre-alpha version of the game. </p>
+
+            <h3>What is a phantom load?</h3>
+            <p>Phantom loads are the electricity silently consumed when devices are plugged in but not actively used. It
+                is the power used for standby functions, remote capabilities, and instant-on features even when
+                appearing "off." Broadly, energy use that does not lead to productive use can be considered a phantom
+                load. </p>
+            <p>Join the hunt to discover phantom loads and use practical strategies to combat this energy waste.</p>
+
+            <h3>Why this game?</h3>
+            <p>The game transforms how we understand building science and energy flows by making the invisible visible.
+                This hands-on approach creates a fundamentally different learning experience than typical educational
+                settings, where building systems are taught as theoretical concepts. The game cultivates practical
+                skills needed to spot inefficiencies and implement effective solutions—bridging the gap between
+                classroom concepts and professional application. This can help players to make meaningful contributions
+                to building performance improvement from day one in their careers.</p>
+            <h3>Who is involved?</h3>
+            <p>Phantom Load is developed by a team led by the Indian Institute for Human Settlements. </p>
+            <p>This work is openly licensed via CC BY NC ND 4.0.</p>
+            <div><img src="{% static 'images/about.png' %}" alt="Phantom Load Logo"></div>
         </div>
     </div>
 </div>
