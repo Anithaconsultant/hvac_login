@@ -19,11 +19,12 @@
     <div class="welcomeText">
       <div class="logo">
       </div>
-      <p style="color:#ffffff94 ">THE HUNT IS ON</p>
+      <!-- <p style="color:#ffffff94 ">THE HUNT IS ON</p> -->
     </div>
     <div class="login-content">
       <h1 class="auth-title">Login</h1>
-
+      <!-- Coming Soon...<br />
+      <p class="auth-description">Watch this space for further updates...</p> -->
       <div>
         {% if form.errors and not form.non_field_errors %}
         <div class="alert alert-danger" style="display: none;" id="login-error">
@@ -60,8 +61,8 @@
             <button type="submit" class="auth-btn loginbtn">Login</button>
           </div>
 
-          <!--a href="{% url 'account_reset_password' %}" class="auth-link" style="float:right;margin-top:10px;">Forgot
-            Password?</a-->
+          <a href="{% url 'account_reset_password' %}" class="auth-link" style="float:right;margin-top:10px;">Forgot
+            Password?</a>
         </form>
 
       </div>
@@ -78,41 +79,41 @@
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
 
-    // Check if video has already been played in this session
-    const videoPlayed = sessionStorage.getItem('videoPlayed');
+    // // Check if video has already been played in this session
+    // const videoPlayed = sessionStorage.getItem('videoPlayed');
 
-    if (videoPlayed === 'true') {
-      // Skip video, show login form directly
+    // if (videoPlayed === 'true') {
+    //   // Skip video, show login form directly
+    //   videoContainer.classList.remove('active');
+    //   videoContainer.classList.add('hidden');
+
+    //   loginContainer.classList.remove('hidden');
+    //   loginContainer.classList.add('active');
+    // } else {
+    // When video ends, show login
+    video.addEventListener('ended', function () {
       videoContainer.classList.remove('active');
       videoContainer.classList.add('hidden');
 
       loginContainer.classList.remove('hidden');
       loginContainer.classList.add('active');
-    } else {
-      // When video ends, show login
-      video.addEventListener('ended', function () {
+
+      sessionStorage.setItem('videoPlayed', 'true'); // Mark video as played
+    });
+
+    // Optional skip with ESC or SPACE
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.key === ' ') {
+        video.pause();
         videoContainer.classList.remove('active');
         videoContainer.classList.add('hidden');
-
         loginContainer.classList.remove('hidden');
         loginContainer.classList.add('active');
 
         sessionStorage.setItem('videoPlayed', 'true'); // Mark video as played
-      });
+      }
+    });
 
-      // Optional skip with ESC or SPACE
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' || e.key === ' ') {
-          video.pause();
-          videoContainer.classList.remove('active');
-          videoContainer.classList.add('hidden');
-          loginContainer.classList.remove('hidden');
-          loginContainer.classList.add('active');
-
-          sessionStorage.setItem('videoPlayed', 'true'); // Mark video as played
-        }
-      });
-    }
 
     // Show error if it exists
     if (loginError) {

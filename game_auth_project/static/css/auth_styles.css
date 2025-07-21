@@ -787,10 +787,19 @@ body {
 }
 
 .login-content {
-  padding: 2rem;
+  /* padding: 2rem;
   border-radius: 10px;
   width: 100%;
   max-width: 400px;
+   */
+
+  padding: 2rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 695px;
+  color: #ffffff88;
+  font-size: 34px;
+  text-align: center;
 }
 
 /* State classes */

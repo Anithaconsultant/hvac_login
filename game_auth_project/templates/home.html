@@ -6,41 +6,19 @@
 <div class="logo-container ">
   <div class="logo top-right-logo"></div>
 </div>
-<div id="welcomePopup" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <div class="modal-contentimg text-center">
-      <h2 class="excited-text">EXCITED?</h2>
-      <h2 class="excited-text">WANT TO PLAY?</h2>
-      <p class="description">Please visit our stall at the<br>Meeting room near the Recreation Centre</p>
-      <p class="datetime">25th May 2025 &nbsp;&nbsp; 09:30 – 12:30 hours</p>
-      <h3 class="see-you">SEE YOU THERE!</h3>
-    </div>
-  </div>
-</div>
+
 
 <div class="home-container">
 
   <div class="hero-section">
-    <h1 class="hero-title" style="text-align: center;">Welcome!</h1>
+    <h1 class="hero-title" style="text-align: center;">Coming Soon...</h1>
     <div class="hero-description" style="text-align: left;">
-      <p> “<b>Phantom Load</b>, an interactive 3D computer game set in a realistic building environment, allows you to
-        explore
-        rooms, audit energy use, investigate HVAC systems, trace ductwork and piping, and make design or operational
-        changes to improve thermal comfort and energy performance.</p>
-      <p>
-        Reducing energy wastage requires awareness of hidden or unnoticed energy drains, often referred to as latent or
-        phantom loads. These silently consume power and are frequently overlooked. Addressing such inefficiencies can
-        lead
-        to significant energy savings.
-      </p>
-      <p> <b>Visit our stall at the project exhibit area for an early peek into Phantom Load!</b></p>
-      Date: 25 May 2025
-      <br />Time: 09:30 - 12:30 hours
-      <br /> Meeting room near the recreation Centre
+      Watch this space for further updates.</div>
 
-    </div>
-
+          <a href="{% url 'update_user_data' %}" class="btn btn-primary">
+            <i class="bi bi-pencil-square"></i> Update Your Data
+        </a>
+{{user_data}}
     <div class="download-buttons">
       <a href="#" class="download-btn windows-btn disabled" aria-disabled="true">
         <i class="fab fa-windows"></i> Download for Windows
@@ -53,30 +31,6 @@
 </div>
 
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Get the modal
-    var modal = document.getElementById('welcomePopup');
 
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
-    modal.classList.add('active');
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function () {
-      modal.style.display = "none";
-      modal.classList.remove('active');
-    }
-
-    // When the user clicks anywhere outside the modal, close it
-    window.onclick = function (event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-        modal.classList.remove('active');
-      }
-    }
-  });
-
-
-</script>
 
 {% endblock %}

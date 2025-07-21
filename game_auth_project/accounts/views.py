@@ -1,7 +1,9 @@
 from django.shortcuts import redirect, render
+from django.views import View
 from django.contrib.auth.decorators import login_required
 from allauth.account.views import EmailVerificationSentView, LoginView, SignupView
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from django.http import JsonResponse, Http404, FileResponse
 from django.utils import timezone
@@ -18,8 +20,9 @@ from rest_framework import status
 from rest_framework.parsers import JSONParser
 import os
 import json
+from django.contrib import messages
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Sum, Max
 from django.contrib.auth import login as auth_login
 from .forms import CustomUserCreationForm
@@ -43,11 +46,13 @@ def home_redirect(request):
     return redirect('account_login')  # Goes to allauth login
 
 
+@login_required
 def home_view(request):
-    """Actual home page view"""
     if not request.user.is_authenticated:
         return redirect('account_login')
-    return render(request, 'home.html')  # Your actual home template
+
+    return render(request, 'home.html')
+
 
 
 class CustomEmailVerificationSentView(TemplateView):
@@ -194,6 +199,7 @@ def update_game_progress(request):
 def view_progress(request):
     progress_data = UserGameProgress.objects.filter(
         user=request.user).order_by('level', 'attempt_number', 'task_number')
+    print("Progress data:", progress_data)  # Debugging line
     return render(request, 'progress_data.html', {'progress_data': progress_data})
 
 
@@ -245,7 +251,8 @@ def leaderboard(request):
         user.tools_earned_list = sorted(all_tools) if all_tools else []
         user.badges = ', '.join(sorted(all_badges)) if all_badges else "-"
         user.badges_list = sorted(all_badges) if all_badges else []
-        user.super_powers = ', '.join(sorted(all_powers)) if all_powers else "-"
+        user.super_powers = ', '.join(
+            sorted(all_powers)) if all_powers else "-"
         user.super_powers_list = sorted(all_powers) if all_powers else []
 
     return render(request, 'leaderboard.html', {'leaderboard_data': leaderboard_data})

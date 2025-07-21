@@ -116,3 +116,32 @@ class ClientLoginView(APIView):
                 return Response({'detail': 'User account is disabled.'}, status=status.HTTP_403_FORBIDDEN)
         else:
             return Response({'detail': 'Invalid password.'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+class UserDataView(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            return Response({
+                'user_id': user.id,
+                'email': user.email,
+                'username': user.username,
+                'user_data': user.user_data,
+            }, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            user_data = request.data.get('user_data')
+            if user_data is None:
+                return Response({'detail': 'user_data is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            user.user_data = user_data
+            user.save()
+
+            return Response({'detail': 'User data updated successfully.'}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)

@@ -49,6 +49,7 @@ class CustomUser(AbstractUser):
     nickname = models.CharField(max_length=30, blank=True, null=True)
     mobile_number = models.CharField(max_length=20, blank=True, null=True)
     date_registered = models.DateTimeField(default=timezone.now)
+    user_data = models.JSONField(default=list)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
@@ -82,6 +83,8 @@ class UserGameProgress(models.Model):
     badges = models.JSONField(default=list)
     super_powers = models.JSONField(default=list)
     timestamp = models.DateTimeField(auto_now_add=True)
+    
+    
 
     class Meta:
         unique_together = ('user', 'level', 'attempt_number','task_number')
