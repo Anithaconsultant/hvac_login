@@ -11,15 +11,15 @@
 <div class="home-container">
 
   <div class="hero-section">
-    <h1 class="hero-title" style="text-align: center;">Coming Soon...</h1>
-    <div class="hero-description" style="text-align: left;">
-      Watch this space for further updates.</div>
+    <!--h1 class="hero-title" style="text-align: center;">Coming Soon...</h1-->
+    <div class="hero-description" style="text-align: center;">
+    Click on the link to see the demo version of the game. <a target="_blank" href="https://phantom-load.in/webgl/"><div class="button_webgl">Demo</div></a></div>
+    <!-- <input type="text" id="filename" placeholder="Enter Excel filename (e.g., data.xlsx)">
+    <button id="readExcelBtn">Read Excel from static/docs</button> 
 
-          <a href="{% url 'update_user_data' %}" class="btn btn-primary">
-            <i class="bi bi-pencil-square"></i> Update Your Data
-        </a>
-{{user_data}}
-    <div class="download-buttons">
+    <pre id="output" style="height:240px;overflow: scroll;"></pre>
+    {{user_data}}-->
+    <div class="download-buttons" style="margin-top:40px;">
       <a href="#" class="download-btn windows-btn disabled" aria-disabled="true">
         <i class="fab fa-windows"></i> Download for Windows
       </a>
@@ -31,6 +31,17 @@
 </div>
 
 
+<!-- 
+<script>
+  document.getElementById("readExcelBtn").addEventListener("click", function () {
+    const filename = document.getElementById("filename").value;
 
-
+    console.log(filename, `/api/read-excel/?filename=${encodeURIComponent(filename)}`);
+    fetch(`/api/read-excel/?filename=${encodeURIComponent(filename)}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      });
+  });
+</script> -->
 {% endblock %}

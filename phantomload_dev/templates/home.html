@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="logo-container ">
+  <div class="logo top-right-logo"></div>
+</div>
+
+
+<div class="home-container">
+
+  <div class="hero-section">
+    <h1 class="hero-title" style="text-align: center;">Coming Soon...</h1>
+    <div class="hero-description" style="text-align: center;">
+      Watch this space for further updates.</div>
+    <!-- <input type="text" id="filename" placeholder="Enter Excel filename (e.g., data.xlsx)">
+    <button id="readExcelBtn">Read Excel from static/docs</button> 
+
+    <pre id="output" style="height:240px;overflow: scroll;"></pre>
+    {{user_data}}-->
+    <div class="download-buttons" style="margin-top:40px;">
+      <a href="#" class="download-btn windows-btn disabled" aria-disabled="true">
+        <i class="fab fa-windows"></i> Download for Windows
+      </a>
+      <a href="#" class="download-btn windows-btn disabled" aria-disabled="true">
+        <i class="fab fa-apple"></i> Download for Mac
+      </a>
+    </div>
+  </div>
+</div>
+
+
+<!-- 
+<script>
+  document.getElementById("readExcelBtn").addEventListener("click", function () {
+    const filename = document.getElementById("filename").value;
+
+    console.log(filename, `/api/read-excel/?filename=${encodeURIComponent(filename)}`);
+    fetch(`/api/read-excel/?filename=${encodeURIComponent(filename)}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      });
+  });
+</script> -->
+{% endblock %}

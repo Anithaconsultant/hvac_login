@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'widget_tweaks',
     'accounts',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -111,7 +112,7 @@ ACCOUNT_FORMS = {
 }
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'

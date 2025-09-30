@@ -23,7 +23,7 @@ import json
 from django.contrib import messages
 from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
-from django.db.models import Sum, Max
+from django.db.models import Sum,Min
 from django.contrib.auth import login as auth_login
 from .forms import CustomUserCreationForm
 from django.urls import reverse
@@ -208,14 +208,13 @@ def leaderboard(request):
     # Calculate net points for each user (sum of all points_scored)
     leaderboard_data = CustomUser.objects.annotate(
         total_points=Sum('usergameprogress__points_scored'),
-        max_level=Max('usergameprogress__level'),
-        time_taken=Max('usergameprogress__time_taken')
+        time_taken=Min('usergameprogress__time_taken')
     ).order_by('-total_points', 'time_taken')
 
     # Get tools, badges, and super_powers for each user
     for user in leaderboard_data:
         progress_data = UserGameProgress.objects.filter(user=user)
-
+        
         # Initialize sets to avoid duplicates
         all_tools = set()
         all_badges = set()
@@ -260,6 +259,9 @@ def leaderboard(request):
 
 def about(request):
     return render(request, 'about.html')
+
+def feedback(request):
+    return render(request, 'feedback.html')
 
 
 def credits(request):

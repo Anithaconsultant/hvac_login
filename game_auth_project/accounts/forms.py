@@ -7,6 +7,9 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field
+from ckeditor.widgets import CKEditorWidget
+
+
 import json
 
 # class CustomUserCreationForm(SignupForm):
@@ -56,11 +59,7 @@ import json
 #         return user
 
 
-from django import forms
-from allauth.account.forms import SignupForm
-from django.utils.safestring import mark_safe
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
+
 
 class CustomUserCreationForm(SignupForm):
     first_name = forms.CharField(max_length=30, required=True)
@@ -248,3 +247,7 @@ class UserGameProgressForm(forms.ModelForm):
                     cleaned_data[field] = items
             
             return cleaned_data
+
+
+class FeedbackForm(forms.Form):
+    comments = forms.CharField(widget=CKEditorWidget(), label="Your Feedback")

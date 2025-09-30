@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.views.generic import TemplateView
 # from accounts.views import home_redirect, home_view, CustomEmailVerificationSentView, UserListView, download_windows, download_mac, update_game_progress, view_progress, leaderboard  # or accounts.views if you prefer
-from accounts.api import CustomTokenObtainPairView, RegisterView, ClientLoginView,UserDataView
+from accounts.api import CustomTokenObtainPairView, RegisterView, ClientLoginView,UserDataView,ReadExcelStaticView
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
@@ -19,6 +19,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/register/', RegisterView.as_view(), name='register'),
+    path('api/read-excel/', ReadExcelStaticView.as_view(), name='read-excel'),
     path('admin/', admin.site.urls),
     path('accounts/signup/', CustomSignupView.as_view(), name='account_signup'),
     path('accounts/login/', LoginView.as_view(), name='account_login'),
@@ -36,6 +37,7 @@ urlpatterns = [
          name='update_game_progress'),
     path('view-progress/', views.view_progress, name='view_progress'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),
+    path('feedback/', views.feedback, name='feedback'),
     path('about/', views.about, name='about'),
     path('credits/', views.credits, name='credits'),
     path('profile/', views.profile, name='profile'),

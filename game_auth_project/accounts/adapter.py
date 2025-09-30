@@ -24,13 +24,13 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         return email
 
     # Comment out email sending functionality since we're disabling verification
-    # def send_mail(self, template_prefix, email, context):
-    #     """
-    #     Add support email to all outgoing emails
-    #     """
-    #     context['support_email'] = 'support@phantom-load.in'
-    #     context['site_name'] = settings.SITE_NAME
-    #     return super().send_mail(template_prefix, email, context)
+    def send_mail(self, template_prefix, email, context):
+        """
+        Add support email to all outgoing emails
+        """
+        context['support_email'] = 'support@phantom-load.in'
+        context['site_name'] = settings.SITE_NAME
+        return super().send_mail(template_prefix, email, context)
 
     # Disable email verification requirement
     def is_open_for_signup(self, request):
@@ -38,8 +38,11 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 
     # Skip email verification
     def confirm_email(self, request, email_address):
-        return
+        email_address.verified = True
+        email_address.save()
+        return email_address
 
     # Don't require email confirmation
     def get_email_confirmation_url(self, request, emailconfirmation):
-        return
+        url = reverse("account_confirm_email", args=[emailconfirmation.key])
+        return f"{request.scheme}://{request.get_host()}{url}"
