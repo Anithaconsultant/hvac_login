@@ -27,16 +27,35 @@ from django.db.models import Sum,Min
 from django.contrib.auth import login as auth_login
 from .forms import CustomUserCreationForm
 from django.urls import reverse
+from allauth.account.utils import send_email_confirmation
+from allauth.account.views import ConfirmEmailView
 
+class CustomConfirmEmailView(ConfirmEmailView):
+    def post(self, *args, **kwargs):
+        response = super().post(*args, **kwargs)
+        if self.request.user.is_authenticated:
+            login(self.request, self.request.user)
+        return redirect('home')
 
+    def get(self, *args, **kwargs):
+        response = super().get(*args, **kwargs)
+        if self.request.user.is_authenticated:
+            login(self.request, self.request.user)
+            return redirect('home')
+        return response
+    
+    
 class CustomSignupView(SignupView):
-    form_class = CustomUserCreationForm  # Your custom form
+    form_class = CustomUserCreationForm
 
     def form_valid(self, form):
-        # Create the user but don't log them in
-        user = form.save(self.request)
-        # Redirect to login page with success message
-        return redirect(reverse('account_login') + '?signup_success=1')
+        # Let allauth create the user
+        response = super().form_valid(form)
+
+        # Send confirmation immediately
+        send_email_confirmation(self.request, self.user, signup=True)
+
+        return redirect('account_email_verification_sent')
 
 
 def home_redirect(request):

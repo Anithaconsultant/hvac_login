@@ -8,7 +8,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-from accounts.views import CustomSignupView
+from accounts.views import CustomSignupView,CustomEmailVerificationSentView,CustomConfirmEmailView
 from allauth.account.views import LoginView
 from accounts import views
 from django.conf import settings
@@ -23,9 +23,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/signup/', CustomSignupView.as_view(), name='account_signup'),
     path('accounts/login/', LoginView.as_view(), name='account_login'),
-    path('accounts/confirm-email/', views.CustomEmailVerificationSentView.as_view(),
-         name='account_email_verification_sent'),
+
     path('accounts/', include('allauth.urls')),
+    path("accounts/confirm-email/<key>/",
+         CustomConfirmEmailView.as_view(),
+         name="account_confirm_email"),
     path('', views.home_redirect, name='redirect-root'),  # Temporary redirect
     path('home/', views.home_view, name='home'),  # Actual home page view
     path('api/users/', views.UserListView.as_view(), name='user-list'),
@@ -50,3 +52,8 @@ if settings.DEBUG:
                           document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
+
+
+#     path("email-verification-sent/", CustomEmailVerificationSentView.as_view(), name="account_email_verification_sent"),
+#     path('accounts/confirm-email/', views.CustomEmailVerificationSentView.as_view(),
+#          name='account_email_verification_sent'),

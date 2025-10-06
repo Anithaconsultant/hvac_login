@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Feedback{% endblock %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Feedback</title>
+</head>
+<body>
+    <h2>Send us your Feedback</h2>
+
+    {% if messages %}
+      {% for msg in messages %}
+        <p style="color:green;">{{ msg }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="id_comments">Your Feedback:</label><br>
+        {{ form.comments }}  <!-- renders textarea -->
+        <br><br>
+        <button type="submit">Send Feedback</button>
+    </form>
+</body>
+</html>
+{% endblock %}

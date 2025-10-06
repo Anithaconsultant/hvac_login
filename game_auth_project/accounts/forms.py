@@ -248,6 +248,3 @@ class UserGameProgressForm(forms.ModelForm):
             
             return cleaned_data
 
-
-class FeedbackForm(forms.Form):
-    comments = forms.CharField(widget=CKEditorWidget(), label="Your Feedback")

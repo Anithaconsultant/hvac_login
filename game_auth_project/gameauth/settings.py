@@ -110,7 +110,7 @@ SITE_ID = 1
 ACCOUNT_FORMS = {
     'signup': 'accounts.forms.CustomUserCreationForm',
 }
-
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_UNIQUE_EMAIL = True
@@ -126,6 +126,11 @@ ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
