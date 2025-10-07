@@ -8,7 +8,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-from accounts.views import CustomSignupView,CustomEmailVerificationSentView,CustomConfirmEmailView
+from accounts.views import CustomSignupView,CustomEmailVerificationSentView,CustomConfirmEmailView,feedback_view
 from allauth.account.views import LoginView
 from accounts import views
 from django.conf import settings
@@ -39,7 +39,7 @@ urlpatterns = [
          name='update_game_progress'),
     path('view-progress/', views.view_progress, name='view_progress'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),
-    path('feedback/', views.feedback, name='feedback'),
+    path('feedback/', views.feedback_view, name='feedback'),
     path('about/', views.about, name='about'),
     path('credits/', views.credits, name='credits'),
     path('profile/', views.profile, name='profile'),

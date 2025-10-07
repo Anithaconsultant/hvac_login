@@ -1,3 +1,6 @@
+from django.core.mail import send_mail
+import smtplib
+import logging
 from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib.auth.decorators import login_required
@@ -11,7 +14,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from .serializers import GameProgressSerializer
-from .forms import UserGameProgressForm
+from .forms import UserGameProgressForm, FeedbackForm
 from .models import UserGameProgress, CustomUser
 from django.contrib.auth.decorators import login_required
 import django
@@ -23,12 +26,13 @@ import json
 from django.contrib import messages
 from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
-from django.db.models import Sum,Min
+from django.db.models import Sum, Min
 from django.contrib.auth import login as auth_login
 from .forms import CustomUserCreationForm
 from django.urls import reverse
 from allauth.account.utils import send_email_confirmation
 from allauth.account.views import ConfirmEmailView
+
 
 class CustomConfirmEmailView(ConfirmEmailView):
     def post(self, *args, **kwargs):
@@ -43,8 +47,8 @@ class CustomConfirmEmailView(ConfirmEmailView):
             login(self.request, self.request.user)
             return redirect('home')
         return response
-    
-    
+
+
 class CustomSignupView(SignupView):
     form_class = CustomUserCreationForm
 
@@ -71,7 +75,6 @@ def home_view(request):
         return redirect('account_login')
 
     return render(request, 'home.html')
-
 
 
 class CustomEmailVerificationSentView(TemplateView):
@@ -217,8 +220,31 @@ def update_game_progress(request):
 @login_required
 def view_progress(request):
     progress_data = UserGameProgress.objects.filter(
-        user=request.user).order_by('level', 'attempt_number', 'task_number')
-    print("Progress data:", progress_data)  # Debugging line
+        user=request.user
+    ).order_by('level', 'attempt_number', 'task_number')
+
+    for progress in progress_data:
+        # Split and clean tools_earned
+        tools = (
+            progress.tools_earned.split(',') if isinstance(progress.tools_earned, str)
+            else progress.tools_earned or []
+        )
+        progress.tools_earned_list = [tool.strip() for tool in tools if tool.strip()]
+
+        # Split and clean badges
+        badges = (
+            progress.badges.split(',') if isinstance(progress.badges, str)
+            else progress.badges or []
+        )
+        progress.badges_list = [badge.strip() for badge in badges if badge.strip()]
+
+        # Split and clean super_powers
+        powers = (
+            progress.super_powers.split(',') if isinstance(progress.super_powers, str)
+            else progress.super_powers or []
+        )
+        progress.super_powers_list = [power.strip() for power in powers if power.strip()]
+
     return render(request, 'progress_data.html', {'progress_data': progress_data})
 
 
@@ -233,7 +259,7 @@ def leaderboard(request):
     # Get tools, badges, and super_powers for each user
     for user in leaderboard_data:
         progress_data = UserGameProgress.objects.filter(user=user)
-        
+
         # Initialize sets to avoid duplicates
         all_tools = set()
         all_badges = set()
@@ -279,8 +305,82 @@ def leaderboard(request):
 def about(request):
     return render(request, 'about.html')
 
-def feedback(request):
-    return render(request, 'feedback.html')
+
+# views.py
+
+logger = logging.getLogger(__name__)
+
+
+def feedback_view(request):
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback = form.cleaned_data['feedback']
+            user_email = form.cleaned_data['email'] or request.user.email
+
+            print(f"=== FEEDBACK SUBMISSION ===")
+            print(f"Feedback: {feedback}")
+            print(f"User email: {user_email}")
+
+            # Create email content
+            subject = "New Feedback - Phantom Load Application"
+            message = f"""
+New feedback has been submitted through the Phantom Load application:
+
+FEEDBACK:
+{feedback}
+
+SUBMITTED BY:
+- User: {request.user.email if request.user.is_authenticated else 'Anonymous'}
+- Email: {user_email if user_email != 'Not provided' else 'Not provided'}
+- Timestamp: {timezone.now()}
+
+Please review this feedback and take appropriate action.
+"""
+
+            try:
+           
+                result = send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=['support@phantom-load.in'],
+                    fail_silently=False,
+                )
+
+                print(f"=== EMAIL SEND RESULT: {result} ===")
+
+                if result == 1:
+                    messages.success(
+                        request, 'Thank you for your feedback! Your message has been sent successfully.')
+                    print("✅ Feedback email sent successfully")
+                else:
+                    messages.error(
+                        request, 'Failed to send feedback. Please try again.')
+                    print("❌ Feedback email failed")
+
+                return redirect('feedback')
+
+            except smtplib.SMTPAuthenticationError as e:
+                error_msg = "Email authentication failed. Please check the email configuration."
+                print(f"❌ SMTP Authentication Error: {e}")
+                messages.error(request, error_msg)
+            except smtplib.SMTPException as e:
+                error_msg = "Email service error. Please try again later."
+                print(f"❌ SMTP Error: {e}")
+                messages.error(request, error_msg)
+            except Exception as e:
+                error_msg = f"Error sending feedback: {str(e)}"
+                print(f"❌ General Error: {e}")
+                messages.error(request, error_msg)
+        else:
+            print("Form validation failed")
+            messages.error(request, 'Please correct the errors below.')
+
+    else:
+        form = FeedbackForm()
+
+    return render(request, 'feedback.html', {'form': form})
 
 
 def credits(request):

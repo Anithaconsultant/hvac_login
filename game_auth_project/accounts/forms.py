@@ -248,3 +248,21 @@ class UserGameProgressForm(forms.ModelForm):
             
             return cleaned_data
 
+class FeedbackForm(forms.Form):
+    feedback = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 10,
+            'cols': 40,
+            'placeholder': 'Please enter your feedback here...',
+            'class': 'form-control'
+        }),
+        label='Your Feedback'
+    )
+    email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Your email (optional)',
+            'class': 'form-control'
+        }),
+        label='Email (Optional)'
+    )
