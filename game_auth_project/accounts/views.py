@@ -316,7 +316,7 @@ def feedback_view(request):
         form = FeedbackForm(request.POST)
         if form.is_valid():
             feedback = form.cleaned_data['feedback']
-            user_email = form.cleaned_data['email'] or request.user.email
+            user_email = form.cleaned_data['email']
 
             print(f"=== FEEDBACK SUBMISSION ===")
             print(f"Feedback: {feedback}")
@@ -332,7 +332,7 @@ FEEDBACK:
 
 SUBMITTED BY:
 - User: {request.user.email if request.user.is_authenticated else 'Anonymous'}
-- Email: {user_email if user_email != 'Not provided' else 'Not provided'}
+- Email: {user_email}
 - Timestamp: {timezone.now()}
 
 Please review this feedback and take appropriate action.

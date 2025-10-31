@@ -250,6 +250,7 @@ class UserGameProgressForm(forms.ModelForm):
 
 class FeedbackForm(forms.Form):
     feedback = forms.CharField(
+        required=True,
         widget=forms.Textarea(attrs={
             'rows': 10,
             'cols': 40,
@@ -259,10 +260,10 @@ class FeedbackForm(forms.Form):
         label='Your Feedback'
     )
     email = forms.EmailField(
-        required=False,
+        required=True,
         widget=forms.EmailInput(attrs={
-            'placeholder': 'Your email (optional)',
+            'placeholder': 'Your email',
             'class': 'form-control'
         }),
-        label='Email (Optional)'
+        label='Your Email Address'
     )

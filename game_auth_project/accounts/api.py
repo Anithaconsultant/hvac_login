@@ -180,7 +180,7 @@ class ReadExcelStaticView(APIView):
     Reads a CSV file from staticfiles/docs and returns only columns H, J, K, L, M, N, and O as JSON.
         """
 
-   
+   m,n 
     def get(self, request):
         filename = request.query_params.get('filename')
         if not filename:
