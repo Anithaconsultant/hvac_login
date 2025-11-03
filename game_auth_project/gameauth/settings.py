@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'widget_tweaks',
     'accounts',
-    'ckeditor',
 ]
 
 MIDDLEWARE = [

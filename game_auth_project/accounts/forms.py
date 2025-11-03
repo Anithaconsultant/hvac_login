@@ -7,7 +7,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field
-from ckeditor.widgets import CKEditorWidget
 
 
 import json

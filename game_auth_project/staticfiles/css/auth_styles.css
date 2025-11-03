@@ -422,7 +422,8 @@ body {
   background: #343a40;
   color: white;
   border-color: #454d55;
-  padding: 12px 8px;
+  padding: 10px 5px;
+  text-align: center;
 }
 
 .leaderboard-header th.rank-col,
@@ -606,13 +607,15 @@ body {
 }
 
 .data-row:hover {
-  background-color: #f8f9fa;
+  background-color: #555555;
+  color: #fff;
 }
 
 .data-table td {
   padding: 10px;
   border-bottom: 1px solid #e9ecef;
   vertical-align: middle;
+  text-align:center;
 }
 
 .progress-table .col-rank {
@@ -655,20 +658,8 @@ body {
   width: 15%;
 }
 
-.progress-table .cell-time {
-  font-family: 'Courier New', monospace;
-  color: #495057;
-}
 
-.progress-table .cell-points {
-  font-weight: bold;
-  color: #28a745;
-}
 
-.progress-table .cell-max-points {
-  color: #6c757d;
-  font-weight: 500;
-}
 
 /* Status Badges */
 .status-badge {
@@ -698,10 +689,12 @@ body {
   background-color: transparent;
   color: #fff;
 }
+
 .feedback-body {
   background-color: transparent;
   color: darkgrey;
 }
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .hero-title {
