@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from datetime import timedelta
 import os
 from pathlib import Path
-
+from django.urls import reverse_lazy  # ✅ Add this line
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -85,13 +85,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'phantomload_dev.wsgi.application'
 
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-     'default': {
-         'ENGINE': 'django.db.backends.mysql',
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'phantomload_dev',
         'USER': 'phantomdev',
         'PASSWORD': 'Admin@1234',
@@ -102,7 +101,7 @@ DATABASES = {
             'charset': 'utf8mb4',
         }
     }
-}   
+}
 
 
 # Password validation
@@ -146,7 +145,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -166,31 +164,44 @@ ACCOUNT_FORMS = {
 }
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 SITE_NAME = "Phantomload"
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*']
-
 LOGIN_REDIRECT_URL = '/home/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+
+
 
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Email Configuration
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'support@phantom-load.in'
+# EMAIL_HOST_PASSWORD = 'jayt wswx zjqr onwx'
+# DEFAULT_FROM_EMAIL = 'support@phantom-load.in'
+# SERVER_EMAIL = 'support@phantom-load.in'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.zeptomail.in'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'support@phantom-load.in'
-EMAIL_HOST_PASSWORD = 'jayt wswx zjqr onwx'
+EMAIL_HOST_USER = 'emailapikey'  # from ZeptoMail
+EMAIL_HOST_PASSWORD = 'PHtE6r1bRL/pjTR++kQB7fa6EsT1Z4l7+OtnKQgRtt1BX/cATE1W/o8tkT60qhl8BPlCQv6Tnd5s4ume5riNdGy/YGpNXGqyqK3sx/VYSPOZsbq6x00bslsddE3dXYPvc95j0iXes9bYNA=='
 DEFAULT_FROM_EMAIL = 'support@phantom-load.in'
 SERVER_EMAIL = 'support@phantom-load.in'
+EMAIL_DEBUG = True
 
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Phantom Load - '
 ACCOUNT_EMAIL_VERIFICATION_SUBJECT = 'Verify your email address'
 ACCOUNT_EMAIL_CONFIRMATION_HTML_TEMPLATE = "account/email/email_confirmation_message.html"
