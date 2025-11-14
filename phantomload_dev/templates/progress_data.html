@@ -58,7 +58,7 @@
                             <td class="cell-tools">
                                 {% if progress.tools_earned %}
                                 <div class="items-container">
-                                    {% for tool in progress.tools_earned.split %}
+                                    {% for tool in progress.tools_earned_list  %}
                                     <span class="item-badge tool-badge">{{ tool }}</span>
                                     {% endfor %}
                                 </div>
@@ -69,7 +69,7 @@
                             <td class="cell-badges">
                                 {% if progress.badges %}
                                 <div class="items-container">
-                                    {% for badge in progress.badges.split %}
+                                    {% for badge in progress.badges_list %}
                                     <span class="item-badge badge-badge">{{ badge }}</span>
                                     {% endfor %}
                                 </div>
@@ -80,7 +80,7 @@
                             <td class="cell-powers">
                                 {% if progress.super_powers %}
                                 <div class="items-container">
-                                    {% for power in progress.super_powers.split %}
+                                    {% for power in progress.super_powers_list %}
                                     <span class="item-badge power-badge">{{ power }}</span>
                                     {% endfor %}
                                 </div>

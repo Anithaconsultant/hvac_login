@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from datetime import timedelta
 import os
 from pathlib import Path
-from django.urls import reverse_lazy  # ✅ Add this line
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -164,11 +162,12 @@ ACCOUNT_FORMS = {
 }
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory' 
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+
 SITE_NAME = "Phantomload"
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*']
@@ -201,7 +200,6 @@ DEFAULT_FROM_EMAIL = 'support@phantom-load.in'
 SERVER_EMAIL = 'support@phantom-load.in'
 EMAIL_DEBUG = True
 
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Phantom Load - '
 ACCOUNT_EMAIL_VERIFICATION_SUBJECT = 'Verify your email address'
 ACCOUNT_EMAIL_CONFIRMATION_HTML_TEMPLATE = "account/email/email_confirmation_message.html"

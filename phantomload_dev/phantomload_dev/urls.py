@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.views.generic import TemplateView
-# from accounts.views import home_redirect, home_view, CustomEmailVerificationSentView, UserListView, download_windows, download_mac, update_game_progress, view_progress, leaderboard  # or accounts.views if you prefer
+from accounts.views import home_redirect, home_view, CustomEmailVerificationSentView, UserListView, download_windows, download_mac, update_game_progress, view_progress, leaderboard ,CustomConfirmEmailView # or accounts.views if you prefer
 from accounts.api import CustomTokenObtainPairView, RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, FilterCSVDataTask09
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
@@ -27,9 +27,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/signup/', CustomSignupView.as_view(), name='account_signup'),
     path('accounts/login/', LoginView.as_view(), name='account_login'),
-    path('accounts/confirm-email/', views.CustomEmailVerificationSentView.as_view(),
-         name='account_email_verification_sent'),
+   
     path('accounts/', include('allauth.urls')),
+    path("accounts/confirm-email/<key>/",
+         CustomConfirmEmailView.as_view(),
+         name="account_confirm_email"),                                      
     path('', views.home_redirect, name='redirect-root'),  # Temporary redirect
     path('home/', views.home_view, name='home'),  # Actual home page view
     path('api/users/', views.UserListView.as_view(), name='user-list'),
@@ -41,6 +43,7 @@ urlpatterns = [
          name='update_game_progress'),
     path('view-progress/', views.view_progress, name='view_progress'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),
+    path('feedback/', views.feedback_view, name='feedback'),                                                        
     path('about/', views.about, name='about'),
     path('credits/', views.credits, name='credits'),
     path('profile/', views.profile, name='profile'),

@@ -20,6 +20,7 @@ import csv
 from django.conf import settings
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import logging
+from num2words import num2words
 User = get_user_model()
 
 
@@ -178,70 +179,6 @@ class UserDataView(APIView):
 
         except User.DoesNotExist:
             return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-# class ReadExcelStaticView(APIView):
-#     """
-#     Reads a CSV file from staticfiles/docs and returns only columns H, J, K, L, M, N, and O as JSON.
-#         """
-
-
-#     def get(self, request):
-#         filename = request.query_params.get('filename')
-#         if not filename:
-#             return Response({'error': 'Filename parameter is required.'}, status=400)
-
-#         if '/' in filename or '\\' in filename:
-#             return Response({'error': 'Invalid filename.'}, status=400)
-
-#         csv_path = os.path.join(settings.BASE_DIR, 'staticfiles/docs', filename)
-
-#         if not os.path.exists(csv_path):
-#             return Response({'filename': filename, 'path': csv_path, 'error': 'File not found.'}, status=404)
-
-#         try:
-#             required_headers = [
-#                'HotSpotID',
-#                 'Power',
-#                 'No_of_hours',
-#                 'Standby_power',
-#                 'Standby_hours',
-#                 'Quanitity_of_fixtures',
-#                 'Diversity_Factor',
-#                 'ActiveZone'
-#             ]
-
-#             data = []
-#             encodings_to_try = ['utf-8-sig', 'utf-16', 'latin1']
-
-#             for enc in encodings_to_try:
-#                 try:
-#                     with open(csv_path, newline='', encoding=enc) as csvfile:
-#                         reader = csv.DictReader(csvfile)
-
-#                         # Check for missing columns
-#                         missing = [h for h in required_headers if h not in reader.fieldnames]
-#                         if missing:
-#                             return Response({'error': f'Missing columns: {", ".join(missing)}'}, status=400)
-
-#                         for row in reader:
-#                             filtered = {h: row[h] for h in required_headers}
-#                             data.append(filtered)
-
-#                     # If we reached here, reading succeeded
-#                     break
-
-#                 except UnicodeDecodeError:
-#                     data = []
-#                     continue
-
-#             if not data:
-#                 return Response({'error': 'Unable to read CSV with supported encodings.'}, status=500)
-
-#             return Response(data)
-
-#         except Exception as e:
-#             return Response({'error': str(e)}, status=500)
-
 
 class ReadExcelAttemptView(APIView):
     EXCEL_FILENAME = "Energy Bill Data Table model.xlsx"

@@ -56,11 +56,6 @@ import json
 #         return user
 
 
-from django import forms
-from allauth.account.forms import SignupForm
-from django.utils.safestring import mark_safe
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 
 class CustomUserCreationForm(SignupForm):
     first_name = forms.CharField(max_length=30, required=True)
@@ -248,3 +243,24 @@ class UserGameProgressForm(forms.ModelForm):
                     cleaned_data[field] = items
             
             return cleaned_data
+
+
+class FeedbackForm(forms.Form):
+    feedback = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={
+            'rows': 10,
+            'cols': 40,
+            'placeholder': 'Please enter your feedback here...',
+            'class': 'form-control'
+        }),
+        label='Your Feedback'
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Your email',
+            'class': 'form-control'
+        }),
+        label='Your Email Address'
+    )
