@@ -20,7 +20,7 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/register/', RegisterView.as_view(), name='register'),
     # path('api/read-excel/', ReadExcelStaticView.as_view(), name='read-excel'),
-    path('api/read-excel-task2/', ReadExcelAttemptView.as_view(),
+    path('api/task02-energybilldata/', ReadExcelAttemptView.as_view(),
          name='read_excel_attempt'),
     path('api/filterdata-Task09/', FilterCSVDataTask09.as_view(),
          name='FilterCSVDataTask09'),
