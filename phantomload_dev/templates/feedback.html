@@ -9,14 +9,14 @@
     <div class="col-md-10">
       <div class="card feedback-card">
         <div class="card-header">
-          <h2 class="card-title mb-0">Send Feedback</h2>
+          <h2 class="card-title mb-0">Give us your feedback</h2>
         </div>
         <div class="card-body feedback-body">
-         
+
 
           <p class="mb-4">
-            We value your feedback! Please share your thoughts, suggestions, or report any issues you've encountered.
-            Your feedback will be sent to our team at support@phantom-load.in.
+            We are continuously working to improve the game and your experience. Use this form to share your thoughts
+            and suggestions, or report any issues you encountered.
           </p>
 
           <form method="post" novalidate>
@@ -30,7 +30,7 @@
             </div>
             {% endif %}
 
-            <div class="mb-3">
+            <!-- <div class="mb-3">
               <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
               {{ form.email }}
               {% if form.email.errors %}
@@ -40,7 +40,7 @@
                 {% endfor %}
               </div>
               {% endif %}
-            </div>
+            </div> -->
 
             <div class="mb-4">
               <label for="{{ form.feedback.id_for_label }}" class="form-label">{{ form.feedback.label }}</label>
@@ -57,7 +57,7 @@
 
             <div class="d-flex gap-2">
               <button type="submit" class="btn btn-primary">
-                <i class="fas fa-paper-plane me-2"></i>Send Feedback
+                <i class="fas fa-paper-plane me-2"></i>Submit
               </button>
               <button type="button" class="btn btn-secondary" onclick="window.history.back()">
                 <i class="fas fa-times me-2"></i>Cancel

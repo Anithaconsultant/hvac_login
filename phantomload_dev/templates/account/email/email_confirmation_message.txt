@@ -1,12 +1,9 @@
-Thank you for registering on Phantomload!
+Thank you for registering on Phantom Load!
 
 Please confirm your email by clicking the link below:
 {{ activate_url }}
 
-------------------------------------------------------
-Click here to see the demo version of the game:
-https://phantom-load.in/webgl/
-------------------------------------------------------
+
 
 If you did not register, please ignore this email.
 

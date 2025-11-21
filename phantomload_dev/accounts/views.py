@@ -26,7 +26,7 @@ import json
 from django.contrib import messages
 from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
-from django.db.models import Sum, Min
+from django.db.models import Sum, Min,Max
 from django.contrib.auth import login as auth_login
 from .forms import CustomUserCreationForm
 from django.urls import reverse

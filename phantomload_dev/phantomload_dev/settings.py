@@ -180,25 +180,25 @@ ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# Email Configuration
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'support@phantom-load.in'
-# EMAIL_HOST_PASSWORD = 'jayt wswx zjqr onwx'
-# DEFAULT_FROM_EMAIL = 'support@phantom-load.in'
-# SERVER_EMAIL = 'support@phantom-load.in'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.zeptomail.in'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'emailapikey'  # from ZeptoMail
-EMAIL_HOST_PASSWORD = 'PHtE6r1bRL/pjTR++kQB7fa6EsT1Z4l7+OtnKQgRtt1BX/cATE1W/o8tkT60qhl8BPlCQv6Tnd5s4ume5riNdGy/YGpNXGqyqK3sx/VYSPOZsbq6x00bslsddE3dXYPvc95j0iXes9bYNA=='
-DEFAULT_FROM_EMAIL = 'support@phantom-load.in'
+EMAIL_HOST_USER = 'support@phantom-load.in'
+EMAIL_HOST_PASSWORD = 'jayt wswx zjqr onwx'
+DEFAULT_FROM_EMAIL = '"Phantom Load" <support@phantom-load.in>'
 SERVER_EMAIL = 'support@phantom-load.in'
-EMAIL_DEBUG = True
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.zeptomail.in'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'emailapikey'  # from ZeptoMail
+# EMAIL_HOST_PASSWORD = 'PHtE6r1bRL/pjTR++kQB7fa6EsT1Z4l7+OtnKQgRtt1BX/cATE1W/o8tkT60qhl8BPlCQv6Tnd5s4ume5riNdGy/YGpNXGqyqK3sx/VYSPOZsbq6x00bslsddE3dXYPvc95j0iXes9bYNA=='
+# DEFAULT_FROM_EMAIL = 'support@phantom-load.in'
+# SERVER_EMAIL = 'support@phantom-load.in'
+# EMAIL_DEBUG = True
 
 ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Phantom Load - '
 ACCOUNT_EMAIL_VERIFICATION_SUBJECT = 'Verify your email address'

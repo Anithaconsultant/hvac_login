@@ -669,7 +669,15 @@ body {
   background-color: #f8d7da;
   color: #721c24;
 }
+.feedback-card {
+  background-color: transparent;
+  color: #fff;
+}
 
+.feedback-body {
+  background-color: transparent;
+  color: darkgrey;
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -904,9 +912,6 @@ body {
 .credits-section {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
 }
 
 .credits-section p {
@@ -951,11 +956,11 @@ body {
 }
 
 .credits-section h3 {
-  color: #b1b2b4b4;
+  color: #e9ecef;
   margin-top: 0;
   margin-bottom: 15px;
   padding-bottom: 8px;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid #8b8b8b;
   font-size: 1.2rem;
 }
 
@@ -968,7 +973,7 @@ body {
 
 .team-list li {
   padding: 4px 0;
-  color: #8b8b8b;
+  color: #e9ecef;
   position: relative;
   padding-left: 20px;
   font-size: 0.95rem;
