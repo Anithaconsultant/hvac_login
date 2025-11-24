@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-(e$3t!sosz9mwqmwc)wccqc2pc!2r8x=%e96=!$gka9f4#ag69
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
+from dotenv import load_dotenv
+import os
 
 # Application definition
 
@@ -174,7 +175,7 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*']
 LOGIN_REDIRECT_URL = '/home/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 
-
+load_dotenv()
 
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -185,8 +186,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'support@phantom-load.in'
-EMAIL_HOST_PASSWORD = 'jayt wswx zjqr onwx'
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = '"Phantom Load" <support@phantom-load.in>'
 SERVER_EMAIL = 'support@phantom-load.in'
 
