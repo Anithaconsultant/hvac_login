@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="logo-container ">
+  <div class="logo top-right-logo"></div>
+</div>
+
+
+<div class="home-container">
+
+  <div class="hero-section">
+    <!--h1 class="hero-title" style="text-align: center;">Coming Soon...</h1-->
+
+
+    <div class="auth-message">
+
+      <div class="auth-note">
+        <p>Click on the menu icon at the top left corner of this screen for more information.</p>
+        <p> Click on the '<b>Play Now</b>' button to experience the alpha version of Phantom Load.</p>
+        <!--p> Downloads will be made available later. </p>-->
+        <div class="items-container"><a target="_blank" class="auth-link" href="https://dev.phantom-load.in/webgl/">
+            <div class="auth-btn" style="text-align: center;">Play Now</div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- <input type="text" id="filename" placeholder="Enter Excel filename (e.g., data.xlsx)">
+    <button id="readExcelBtn">Read Excel from static/docs</button> 
+
+    <pre id="output" style="height:240px;overflow: scroll;"></pre>
+    {{user_data}}
+    <div class="download-buttons" style="margin-top:40px;">
+      <a href="#" class="download-btn windows-btn disabled" aria-disabled="true">
+        <i class="fab fa-windows"></i> Download for Windows
+      </a>
+      <a href="#" class="download-btn windows-btn disabled" aria-disabled="true">
+        <i class="fab fa-apple"></i> Download for Mac
+      </a>
+    </div>-->
+  </div>
+</div>
+
+
+<!-- 
+<script>
+  document.getElementById("readExcelBtn").addEventListener("click", function () {
+    const filename = document.getElementById("filename").value;
+
+    console.log(filename, `/api/read-excel/?filename=${encodeURIComponent(filename)}`);
+    fetch(`/api/read-excel/?filename=${encodeURIComponent(filename)}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      });
+  });
+</script> -->
+<style>
+  .auth-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+  }
+
+ 
+
+  .auth-message {
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    color: #fff
+  }
+
+  .auth-note {
+    background: #3d3c3c;
+    border-left: 4px solid #17a2b8;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .auth-note i {
+    color: #79e7f8;
+    margin-right: 0.5rem;
+  }
+
+  .auth-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+  }
+
+  .auth-link {
+    display: flex;
+    align-items: center;
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .auth-link i {
+    margin-right: 0.5rem;
+  }
+
+  .auth-link:hover {
+    text-decoration: underline;
+  }
+
+  .logout-form {
+    margin: 0;
+  }
+</style>
+{% endblock %}

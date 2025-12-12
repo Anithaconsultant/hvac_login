@@ -1,0 +1,29 @@
+[33mcommit 90d7907b3e4933d6578766535ab58d261ed3f25c[m
+Author: Anithaconsultant <anitha@iihs.ac.in>
+Date:   Fri Dec 12 13:50:17 2025 +0530
+
+    Remove large videos from history
+
+[33mcommit 076c38ecb0ee1edbff592ff5de88dbbc7f54cb10[m
+Author: Anithaconsultant <anitha@iihs.ac.in>
+Date:   Fri Dec 12 13:45:01 2025 +0530
+
+    Fix large video files using Git LFS
+
+[33mcommit feb8535699b9fc033ed6a59b2ed91c81625bb776[m
+Author: Anithaconsultant <anitha@iihs.ac.in>
+Date:   Fri Dec 12 13:42:45 2025 +0530
+
+    comit
+
+[33mcommit bd5edf7d0e5acbe5f2e275f663776bf4db835e1b[m
+Author: Anithaconsultant <anitha@iihs.ac.in>
+Date:   Fri Dec 12 13:41:44 2025 +0530
+
+    without videos
+
+[33mcommit bce042bc22e0452b7a2a1ed68cc064910bfc52bd[m
+Author: Anithaconsultant <anitha@iihs.ac.in>
+Date:   Fri Dec 12 13:37:25 2025 +0530
+
+    All the UI fixes are password_change_done page and default from email format change.
