@@ -9,52 +9,6 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field
 import json
 
-# class CustomUserCreationForm(SignupForm):
-#     first_name = forms.CharField(max_length=30, required=True)
-#     last_name = forms.CharField(max_length=30, required=True)
-#     nickname = forms.CharField(max_length=30, required=False)
-#     mobile_number = forms.CharField(max_length=20, required=False)
-
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-
-#         for field_name in self.fields:
-#             self.fields[field_name].label = ''
-
-#         self.fields['email'].widget.attrs.update({
-#             'class': 'auth-form-control',
-#             'placeholder': 'Email'
-#         })
-#         self.fields['first_name'].widget.attrs.update({
-#             'class': 'auth-form-control',
-#             'placeholder': 'First Name'
-#         })
-#         self.fields['last_name'].widget.attrs.update({
-#             'class': 'auth-form-control',
-#             'placeholder': 'Last Name'
-#         })
-#         self.fields['nickname'].widget.attrs.update({
-#             'class': 'auth-form-control',
-#             'placeholder': 'Nickname (optional)'
-#         })
-#         self.fields['mobile_number'].widget.attrs.update({
-#             'class': 'auth-form-control',
-#             'placeholder': 'Mobile Number (optional)'
-#         })
-#         self.fields['password1'].widget.attrs.update({
-#             'class': 'auth-form-control',
-#             'placeholder': 'Password'
-#         })
-
-#     def save(self, request):
-#         user = super().save(request)
-#         user.first_name = self.cleaned_data['first_name']
-#         user.last_name = self.cleaned_data['last_name']
-#         user.nickname = self.cleaned_data.get('nickname')
-#         user.mobile_number = self.cleaned_data.get('mobile_number')
-#         user.save()
-#         return user
-
 
 
 class CustomUserCreationForm(SignupForm):
@@ -249,18 +203,10 @@ class FeedbackForm(forms.Form):
     feedback = forms.CharField(
         required=True,
         widget=forms.Textarea(attrs={
-            'rows': 10,
-            'cols': 40,
+            'rows': 3,
+            'cols': 30,
             'placeholder': 'Please enter your feedback here...',
             'class': 'form-control'
         }),
         label='Your Feedback'
-    )
-    email = forms.EmailField(
-        required=True,
-        widget=forms.EmailInput(attrs={
-            'placeholder': 'Your email',
-            'class': 'form-control'
-        }),
-        label='Your Email Address'
     )

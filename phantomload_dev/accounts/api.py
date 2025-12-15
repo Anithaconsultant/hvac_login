@@ -1,4 +1,5 @@
 from datetime import datetime
+import traceback
 from num2words import num2words
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -181,7 +182,7 @@ class UserDataView(APIView):
             return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 class ReadExcelAttemptView(APIView):
-    EXCEL_FILENAME = "Energy Bill Data Table model.xlsx"
+    EXCEL_FILENAME = "energy_bill_data_table_model.xlsx"
 
     def get(self, request):
         attempt = request.query_params.get('attempt')
@@ -257,97 +258,14 @@ class ReadExcelAttemptView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=500)
 
-
-# class FilterCSVDataTask09(APIView):
-#     """
-#     Reads five CSV files (Mask + 4 data files) based on the given attempt number.
-#     Skips cells where the mask has False, and combines all four data files row-wise.
-#     """
-
-#     def get(self, request):
-#         attempt = request.query_params.get("attempt")
-#         if not attempt:
-#             return Response({"error": "Attempt parameter is required."}, status=400)
-
-#         try:
-#             attempt_num = int(attempt)
-#         except ValueError:
-#             return Response({"error": "Attempt must be an integer."}, status=400)
-
-#         base_dir = os.path.join(settings.BASE_DIR, "staticfiles", "docs/Task09")
-
-#         # Define dynamic file names
-#         files = {
-#             "mask": f"PL_L1_TASK09_TF_Mask_Attempt{attempt_num}.csv",
-#             "sources": f"PL_L1_TASK09_Sources_Attempt{attempt_num}.csv",
-#             "points": f"PL_L1_TASK09_Points_Attempt{attempt_num}.csv",
-#             "name_value": f"PL_L1_TASK09_Name_Value_Attempt{attempt_num}.csv",
-#             "destinations": f"PL_L1_TASK09_Destinations_Attempt{attempt_num}.csv",
-#         }
-
-#         # Validate existence of all files
-#         for key, fname in files.items():
-#             fpath = os.path.join(base_dir, fname)
-#             if not os.path.exists(fpath):
-#                 return Response({"error": f"File not found: {fname}"}, status=404)
-
-#         try:
-#             # Load mask
-#             mask_df = pd.read_csv(os.path.join(base_dir, files["mask"])).fillna(False)
-#             # Convert truthy values to actual bools
-#             mask_df = mask_df.map(
-#                 lambda x: str(x).strip().lower() in ["true", "1", "yes"]
-#                 if pd.notna(x)
-#                 else False
-#             )
-
-#             # Load data CSVs
-#             dataframes = {
-#                 name: pd.read_csv(os.path.join(base_dir, fname)).fillna("")
-#                 for name, fname in files.items()
-#                 if name != "mask"
-#             }
-
-#             # Align mask and data dimensions
-#             max_rows = len(mask_df)
-#             max_cols = len(mask_df.columns)
-
-#             # Combine data row-wise
-#             combined_data = []
-#             for i in range(max_rows):
-#                 combined_record = {"row": i + 1}
-#                 for sheet_name, df in dataframes.items():
-#                     record = {}
-#                     # Ensure row index exists
-#                     if i < len(df):
-#                         for j in range(min(len(df.columns), max_cols)):
-#                             if bool(mask_df.iloc[i, j]):  # include only True mask cells
-#                                 col_name = df.columns[j]
-#                                 record[col_name] = df.iloc[i, j]
-#                     combined_record[sheet_name] = record
-#                 combined_data.append(combined_record)
-
-#             return Response(
-#                 {
-#                     "attempt": attempt_num,
-#                     "files": {k: v for k, v in files.items()},
-#                     "total_rows": len(combined_data),
-#                     "data": combined_data,
-#                 }
-#             )
-
-#         except Exception as e:
-#             return Response({"error": str(e)}, status=500)
-
-
 class FilterCSVDataTask09(APIView):
-    """
-    Reads 5 CSV files (mask + 4 data files) based on attempt number.
-    Filters cells using TF_Mask and merges matching keys across sheets into combined JSON.
-    Keeps common fields once and merges other columns by sheet.
-    """
 
     def get(self, request):
+        import random
+
+        # -------------------------------------------------------------------
+        # Validate attempt parameter
+        # -------------------------------------------------------------------
         attempt = request.query_params.get("attempt")
         if not attempt:
             return Response({"error": "Attempt parameter is required."}, status=400)
@@ -359,7 +277,9 @@ class FilterCSVDataTask09(APIView):
 
         base_dir = os.path.join(settings.BASE_DIR, "staticfiles", "docs", "Task09")
 
-        # Define filenames
+        # -------------------------------------------------------------------
+        # CSV file definitions
+        # -------------------------------------------------------------------
         files = {
             "mask": f"PL_L1_TASK09_TF_Mask_Attempt{attempt_num}.csv",
             "sources": f"PL_L1_TASK09_Sources_Attempt{attempt_num}.csv",
@@ -368,30 +288,35 @@ class FilterCSVDataTask09(APIView):
             "destinations": f"PL_L1_TASK09_Destinations_Attempt{attempt_num}.csv",
         }
 
-        # Validate file existence
+        # Check file existence
         for key, fname in files.items():
             if not os.path.exists(os.path.join(base_dir, fname)):
                 return Response({"error": f"File not found: {fname}"}, status=404)
 
         try:
-            # --- Load Mask CSV safely ---
-            mask_path = os.path.join(base_dir, files["mask"])
-            mask_df = pd.read_csv(mask_path)
-            mask_df = mask_df.fillna(False).infer_objects(copy=False)
+            # -------------------------------------------------------------------
+            # Load mask CSV
+            # -------------------------------------------------------------------
+            mask_df = pd.read_csv(os.path.join(base_dir, files["mask"]))
+            mask_df = mask_df.fillna('').infer_objects(copy=False)
             mask_df = mask_df.map(
                 lambda x: str(x).strip().lower() in ["true", "1", "yes"]
                 if pd.notna(x)
                 else False
             )
 
-            # --- Load the 4 data CSVs ---
+            # -------------------------------------------------------------------
+            # Load other CSVs
+            # -------------------------------------------------------------------
             dataframes = {
                 name: pd.read_csv(os.path.join(base_dir, fname)).fillna("")
                 for name, fname in files.items()
                 if name != "mask"
             }
 
-            # --- Define common fields (appear once) ---
+            # -------------------------------------------------------------------
+            # Fields that appear only once
+            # -------------------------------------------------------------------
             common_fields = [
                 "Game Level",
                 "Task #",
@@ -403,27 +328,52 @@ class FilterCSVDataTask09(APIView):
                 "ActiveZone",
             ]
 
-            # --- Get max rows dynamically ---
+            # -------------------------------------------------------------------
+            # Define Random Zone Sets
+            # -------------------------------------------------------------------
+            zone_set_1 = [("GF", "Z15"), ("GF", "Z16"), ("GF", "Z18"), ("SF", "Z27")]
+            zone_set_2 = [("GF", "Z04"), ("GF", "Z10"), ("FF", "Z02"), ("FF", "Z08")]
+            zone_set_3 = [("FF", "Z11"), ("FF", "Z06")]
+
+            selected_zone_1 = random.choice(zone_set_1)
+            selected_zone_2 = random.choice(zone_set_2)
+            selected_zone_3 = random.choice(zone_set_3)
+
+            selected_zones = {
+                selected_zone_1,
+                selected_zone_2,
+                selected_zone_3,
+            }
+
+            # -------------------------------------------------------------------
+            # Dynamic size detection
+            # -------------------------------------------------------------------
             max_rows = max(len(df) for df in dataframes.values())
-            max_cols = min(len(mask_df.columns), max(len(df.columns) for df in dataframes.values()))
+            max_cols = min(
+                len(mask_df.columns),
+                max(len(df.columns) for df in dataframes.values())
+            )
 
             merged_data = []
 
+            # -------------------------------------------------------------------
+            # MERGING LOOP
+            # -------------------------------------------------------------------
             for i in range(max_rows):
+
                 row_record = {"row": i + 1}
                 temp_dict = {}
                 has_valid_data = False
 
                 for sheet_name, df in dataframes.items():
+
                     if i >= len(df):
                         continue
 
                     for j in range(min(len(df.columns), max_cols)):
-                        try:
-                            mask_value = bool(mask_df.iloc[i, j])
-                        except Exception:
-                            mask_value = False
 
+                        # Mask check
+                        mask_value = bool(mask_df.iloc[i, j]) if i < len(mask_df) else False
                         if not mask_value:
                             continue
 
@@ -433,21 +383,20 @@ class FilterCSVDataTask09(APIView):
                         if str(value).strip() == "":
                             continue
 
-                        # Convert points values to integer safely
+                        # Convert points
                         if sheet_name == "points":
                             try:
-                                if isinstance(value, (int, float, str)) and str(value).strip():
-                                    value = int(float(value))
-                            except ValueError:
-                                pass  # Ignore if not convertible
+                                value = int(float(value))
+                            except:
+                                pass
 
-                        # --- Common fields only once ---
+                        # Common fields only once
                         if col_name in common_fields:
                             if col_name not in row_record:
                                 row_record[col_name] = value
                             continue
 
-                        # --- Initialize dict for each column if not exists ---
+                        # Initialize merged bucket
                         if col_name not in temp_dict:
                             temp_dict[col_name] = {
                                 "Sources": [],
@@ -456,36 +405,45 @@ class FilterCSVDataTask09(APIView):
                                 "Destinations": [],
                             }
 
-                        # --- Map sheet names properly ---
-                        sheet_key_map = {
+                        sheet_key = {
                             "sources": "Sources",
                             "points": "Points",
                             "name_value": "Name_Value",
                             "destinations": "Destinations",
-                        }
-                        sheet_key = sheet_key_map.get(sheet_name, sheet_name.capitalize())
+                        }.get(sheet_name)
 
-                        # --- Append value safely ---
-                        if sheet_key in temp_dict[col_name]:
-                            temp_dict[col_name][sheet_key].append(value)
-                        else:
-                            temp_dict[col_name][sheet_key] = [value]
-
+                        temp_dict[col_name][sheet_key].append(value)
                         has_valid_data = True
 
-                # --- Clean up empty lists ---
+                # Add merged columns
                 for key, val in temp_dict.items():
                     cleaned = {k: v for k, v in val.items() if v}
                     if cleaned:
                         row_record[key] = cleaned
 
-                # --- Add non-empty rows only ---
+                # Add only used rows
                 if has_valid_data:
                     merged_data.append(row_record)
 
+            # -------------------------------------------------------------------
+            # APPLY ACTIVE ZONE AFTER BUILDING ALL ROWS
+            # -------------------------------------------------------------------
+            for row in merged_data:
+                floor_val = str(row.get("Floor", "")).strip()
+                room_val = str(row.get("Room ID", "")).strip()
+
+                if (floor_val, room_val) in selected_zones:
+                    row["ActiveZone"] = True
+                else:
+                    row["ActiveZone"] = False
+
+            # -------------------------------------------------------------------
+            # Response
+            # -------------------------------------------------------------------
             return Response(
                 {
                     "attempt": attempt_num,
+                    "selected_zones": list(selected_zones),
                     "files": files,
                     "total_rows": len(merged_data),
                     "data": merged_data,
@@ -494,6 +452,5 @@ class FilterCSVDataTask09(APIView):
             )
 
         except Exception as e:
-            print("❌ ERROR in FilterCSVDataTask09:", str(e))
-            print(traceback.format_exc())
+            print("❌ ERROR:", str(e))
             return Response({"error": str(e)}, status=500)

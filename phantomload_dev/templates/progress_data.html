@@ -21,7 +21,7 @@
         </a>
     </div>
     <div class="progress-content">
-        <h1 style="text-align: center;">Game Progress</h1>
+        <h1 style="text-align: center;" class="auth-title">Game Progress</h1>
         <div class="leadertable-content">
             <div class="data-table-container progress-table">
                 <table class="data-table">
@@ -30,13 +30,12 @@
                             <th class="col-rank">Level</th>
                             <th class="col-attempt">Attempt</th>
                             <th class="col-task">Task</th>
-                            <th class="col-status">Status</th>
-                            <th class="col-points">Points</th>
-                            <th class="col-max-points">Max Points</th>
-                            <th class="col-time">Time Taken</th>
+                            <th class="col-status">Attempt Status</th>
+                            <th class="col-points">Points Earned / Max Points</th>
+                            <th class="col-time">Time Taken (seconds)</th>
                             <th class="col-tools">Tools Earned</th>
-                            <th class="col-badges">Badges</th>
-                            <th class="col-powers">Super Powers</th>
+                            <th class="col-badges">Badges Earned</th>
+                            <th class="col-powers">Super Powers Earned</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,8 +51,8 @@
                                     {{ progress.get_completion_status_display }}
                                 </span>
                             </td>
-                            <td class="cell-points">{{ progress.points_scored }}</td>
-                            <td class="cell-max-points">{{ progress.max_points }}</td>
+                            <td class="cell-points">{{ progress.points_scored }} / {{ progress.max_points }}</td>
+                       
                             <td class="cell-time">{{ progress.time_taken|default:"-" }}</td>
                             <td class="cell-tools">
                                 {% if progress.tools_earned %}

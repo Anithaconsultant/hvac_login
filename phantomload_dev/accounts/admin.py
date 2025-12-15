@@ -29,4 +29,13 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email',)
 
 
+    
+from django.contrib import admin
+from .models import ActiveSession
+
+@admin.register(ActiveSession)
+class ActiveSessionAdmin(admin.ModelAdmin):
+    list_display = ("user", "login_time")
+
+
 admin.site.register(CustomUser, CustomUserAdmin)

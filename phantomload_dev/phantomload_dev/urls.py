@@ -2,13 +2,28 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.views.generic import TemplateView
-from accounts.views import home_redirect, home_view, CustomEmailVerificationSentView, UserListView, download_windows, download_mac, update_game_progress, view_progress, leaderboard ,CustomConfirmEmailView # or accounts.views if you prefer
+# from accounts.views import home_redirect, home_view, CustomEmailVerificationSentView, UserListView, download_windows, download_mac, update_game_progress, view_progress, leaderboard, CustomConfirmEmailView  # or accounts.views if you prefer
+from accounts.views import (
+    home_redirect,
+    home_view,
+    CustomEmailVerificationSentView,
+    UserListView,
+    download_windows,
+    download_mac,
+    update_game_progress,
+    view_progress,
+    leaderboard,
+    CustomConfirmEmailView,
+    CustomSignupView,
+    CustomPasswordChangeView,
+    LimitedLoginView
+)
 from accounts.api import CustomTokenObtainPairView, RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, FilterCSVDataTask09
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-from accounts.views import CustomSignupView
+from accounts.views import CustomSignupView, CustomPasswordChangeView
 from allauth.account.views import LoginView
 from accounts import views
 from django.conf import settings
@@ -26,12 +41,22 @@ urlpatterns = [
          name='FilterCSVDataTask09'),
     path('admin/', admin.site.urls),
     path('accounts/signup/', CustomSignupView.as_view(), name='account_signup'),
-    path('accounts/login/', LoginView.as_view(), name='account_login'),
-   
-    path('accounts/', include('allauth.urls')),
+    # path('accounts/login/', LoginView.as_view(), name='account_login'),
+    path('accounts/login/', LimitedLoginView.as_view(),
+         name='account_login'),   # UPDATED
+    path(
+        "accounts/login/",
+        LimitedLoginView.as_view(),
+        name="account_login"
+    ),
+
+    path("accounts/password/change/", CustomPasswordChangeView.as_view(),
+         name="account_change_password"),
+
     path("accounts/confirm-email/<key>/",
          CustomConfirmEmailView.as_view(),
-         name="account_confirm_email"),                                      
+         name="account_confirm_email"),
+    path('accounts/', include('allauth.urls')),
     path('', views.home_redirect, name='redirect-root'),  # Temporary redirect
     path('home/', views.home_view, name='home'),  # Actual home page view
     path('api/users/', views.UserListView.as_view(), name='user-list'),
@@ -43,10 +68,11 @@ urlpatterns = [
          name='update_game_progress'),
     path('view-progress/', views.view_progress, name='view_progress'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),
-    path('feedback/', views.feedback_view, name='feedback'),                                                        
+    path('feedback/', views.feedback_view, name='feedback'),
     path('about/', views.about, name='about'),
     path('credits/', views.credits, name='credits'),
     path('profile/', views.profile, name='profile'),
+    # path('test_email/', views.test_email, name='test_email'),
     path('user_data/<str:user_id>/', UserDataView.as_view(), name='user-data'),
 
 ]

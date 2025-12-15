@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 from datetime import timedelta
+from dotenv import load_dotenv
 import os
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,7 +49,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'widget_tweaks',
-    'accounts',
+    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -182,23 +183,23 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+# DEFAULT_FROM_EMAIL = '"Phantom Load" <support@phantom-load.in>'
+# SERVER_EMAIL = 'support@phantom-load.in'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.zeptomail.in'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = '"Phantom Load" <support@phantom-load.in>'
 SERVER_EMAIL = 'support@phantom-load.in'
-
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.zeptomail.in'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'emailapikey'  # from ZeptoMail
-# EMAIL_HOST_PASSWORD = 'PHtE6r1bRL/pjTR++kQB7fa6EsT1Z4l7+OtnKQgRtt1BX/cATE1W/o8tkT60qhl8BPlCQv6Tnd5s4ume5riNdGy/YGpNXGqyqK3sx/VYSPOZsbq6x00bslsddE3dXYPvc95j0iXes9bYNA=='
-# DEFAULT_FROM_EMAIL = 'support@phantom-load.in'
-# SERVER_EMAIL = 'support@phantom-load.in'
 # EMAIL_DEBUG = True
 
 ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Phantom Load - '
@@ -270,3 +271,9 @@ CORS_ALLOW_METHODS = [
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SAMESITE = 'Lax'
+# Maximum players allowed
+MAX_CONCURRENT_USERS = 1
+
+# VERY IMPORTANT – long session for Unity gameplay
+SESSION_COOKIE_AGE = 12 * 60 * 60   # 12 hours
+SESSION_SAVE_EVERY_REQUEST = True

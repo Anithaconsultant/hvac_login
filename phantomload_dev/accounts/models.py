@@ -1,11 +1,26 @@
-import uuid
+
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from .utils import generate_short_id  
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
-import json
+from django.conf import settings
+
+
+
+class ActiveSession(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    session_key = models.CharField(max_length=40, unique=True)
+    login_time = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f"{self.user.email} active"
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
         if not email:

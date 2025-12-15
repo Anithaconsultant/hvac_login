@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}My Profile{% endblock %}
 
 {% block content %}
 <div class="logo-container ">
@@ -20,15 +20,24 @@
             </div>
         </a>
     </div>
-    <h1 class="profile-title">My Profile</h1>
+
     <div class="profile-content">
-        <p>Welcome, {{ user.nickname }}!</p>
-        <p>Email: {{ user.email }}</p>
-        <!-- Add more profile information as needed -->
+        <div class="textcontent">
+            <h1 class="auth-title">My Profile</h1>
+            <div class="profile-inner-content">
+                <div class="profile-text">
+                    <p>Welcome, {{ user.nickname }}!</p>
+                    <p>Email: {{ user.email }}</p>
+                </div>
+
+                <!-- Add more profile information as needed -->
+                <div class="profile-actions">
+                    <a href="{% url 'account_change_password' %}" class="auth-btn disabled">Change Password</a>
+                    <a href="{% url 'account_logout' %}" class="auth-btn">Logout</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="profile-actions">
-        <a href="#" class="auth-btn disabled">Change Password</a>
-        <a href="{% url 'account_logout' %}" class="auth-btn">Logout</a>
-    </div>
+
     <!-- Profile information and settings -->
     {% endblock %}

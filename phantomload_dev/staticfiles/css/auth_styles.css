@@ -123,9 +123,13 @@ body {
   color: #ffffff;
   justify-content: center;
   align-items: center;
+  text-decoration: none;
   border-radius: 0;
   font-weight: bold;
-  margin-left: auto;
+}
+
+.align-right {
+  justify-content: flex-end;
 }
 
 .auth-btn-container {
@@ -152,7 +156,8 @@ body {
   color: #eee;
   text-align: center;
   margin-bottom: 2rem;
-  font-size: 1.5rem;
+  font-size: 30px;
+
 }
 
 .signup-container .auth-form-control {
@@ -163,6 +168,8 @@ body {
 .about-container,
 .credit-container,
 .leaderboard-container,
+.profile-container,
+.feedbackmain-container,
 .progress-container {
   max-width: 100%;
   margin: 0 auto;
@@ -182,17 +189,6 @@ body {
 
 }
 
-.profile-container {
-  width: 800px;
-  max-width: 100%;
-  height: 601px;
-  display: flex;
-  color: #ffffff99;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
 
 .hero-section {
   margin-bottom: 3rem;
@@ -201,7 +197,8 @@ body {
   border-radius: 10px;
 }
 
-.text-content {
+.text-content
+ {
   height: 500px;
   overflow: auto;
   width: 100%;
@@ -607,12 +604,10 @@ body {
 }
 
 .progress-table .col-points {
-  width: 8%;
+  width: 16%;
 }
 
-.progress-table .col-max-points {
-  width: 8%;
-}
+
 
 .progress-table .col-time {
   width: 10%;
@@ -627,7 +622,7 @@ body {
 }
 
 .progress-table .col-powers {
-  width: 15%;
+  width: 20%;
 }
 
 .progress-table .cell-time {
@@ -669,6 +664,7 @@ body {
   background-color: #f8d7da;
   color: #721c24;
 }
+
 .feedback-card {
   background-color: transparent;
   color: #fff;
@@ -799,7 +795,7 @@ body {
   border-radius: 10px;
   width: 100%;
   max-width: 400px;
-  
+
 
   /* padding: 2rem;
   border-radius: 10px;
@@ -909,60 +905,6 @@ body {
 
 }
 
-.credits-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.credits-section p {
-  text-align: left;
-  margin-bottom: 5px;
-}
-
-.credits-section ul {
-  padding-left: 0px;
-}
-
-.credits-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* Credits Grid Layout */
-.credits-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 30px;
-}
-
-.credits-column {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-/* Credits Section Styling */
-.credits-section {
-  border-radius: 8px;
-  padding: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.credits-section:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.credits-section h3 {
-  color: #e9ecef;
-  margin-top: 0;
-  margin-bottom: 15px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #8b8b8b;
-  font-size: 1.2rem;
-}
 
 /* Team List Styling */
 .team-list {
@@ -987,17 +929,107 @@ body {
   left: 0;
   top: 5px;
 }
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .credits-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .credits-section {
-    padding: 15px;
-  }
+.profile-inner-content
+  {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  text-align: left;
 }
+.profile-actions{
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-self: end;
+}
+.profile-text{
+  width:300px;
+  
+}
+/* Container */
+.credit-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    color: #f5f5f5;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Main Title */
+.auth-title {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+/* Intro text */
+.about-content p {
+    font-size: 16px;
+    color: #e0e0e0;
+}
+
+/* Grid layout */
+.credits-container {
+    margin-top: 30px;
+    height:420px;
+    overflow:auto;
+}
+
+.credits-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+/* Column sections */
+.credits-section {
+    margin-bottom: 40px;
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: 0.3s ease-in-out;
+}
+
+/* Hover effect */
+.credits-section:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Section headings */
+.credits-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+
+/* Names */
+.credits-section p {
+    font-size: 15px;
+    margin: 4px 0;
+    color: #dcdcdc;
+}
+
+/* Home icon spacing */
+.homeicon {
+    margin-bottom: 10px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .credits-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-title {
+        font-size: 28px;
+    }
+}
+
 
 /* MEdia Queries */
 @media (max-width: 575.98px) {
@@ -1060,11 +1092,13 @@ body {
   .home-container,
   .about-container,
   .credit-container,
+  .profile-container,
   .leaderboard-container,
   .progress-container {
     padding: 5px;
     margin-top: 65px;
   }
+
 
   .profile-container .homeicon {
     left: 4px;
