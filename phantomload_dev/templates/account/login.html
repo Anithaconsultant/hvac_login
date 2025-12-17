@@ -18,20 +18,23 @@
 
       <!-- ================= SERVER LIMIT ERROR ================= -->
       {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-danger" id="server-limit-error">
-            {{ message }}
-          </div>
-        {% endfor %}
+      {% for message in messages %}
+      {% if 'limit_error' in message.tags %}
+      <div class="alert alert-danger" id="server-limit-error">
+        {{ message }}
+      </div>
       {% endif %}
+      {% endfor %}
+      {% endif %}
+
 
       <!-- ================= INVALID LOGIN ERROR ================= -->
       {% if form.non_field_errors %}
-        <div class="alert alert-danger" id="login-error">
-          {% for error in form.non_field_errors %}
-            {{ error }}
-          {% endfor %}
-        </div>
+      <div class="alert alert-danger" id="login-error">
+        {% for error in form.non_field_errors %}
+        {{ error }}
+        {% endfor %}
+      </div>
       {% endif %}
 
       <form method="POST" action="{% url 'account_login' %}" id="login-form">
@@ -47,7 +50,7 @@
 
         <div class="auth-btn-container">
           <a href="{% url 'account_signup' %}" class="auth-link"
-             style="margin-top:5px;font-size:20px;font-weight:bold;">
+            style="margin-top:5px;font-size:20px;font-weight:bold;">
             Register
           </a>
 
@@ -56,8 +59,7 @@
           </button>
         </div>
 
-        <a href="{% url 'account_reset_password' %}" class="auth-link"
-           style="float:right;margin-top:10px;">
+        <a href="{% url 'account_reset_password' %}" class="auth-link" style="float:right;margin-top:10px;">
           Forgot Password?
         </a>
       </form>
@@ -68,18 +70,18 @@
 
 <!-- ================= CLEAN & SAFE JS ================= -->
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function () {
     const loginError = document.getElementById('login-error');
 
     // Hide invalid login error when user starts typing
     if (loginError) {
-        document.querySelectorAll('#login-form input').forEach(input => {
-            input.addEventListener('input', () => {
-                loginError.style.display = 'none';
-            });
+      document.querySelectorAll('#login-form input').forEach(input => {
+        input.addEventListener('input', () => {
+          loginError.style.display = 'none';
         });
+      });
     }
-});
+  });
 </script>
 
 {% endblock %}

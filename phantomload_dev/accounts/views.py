@@ -52,7 +52,8 @@ class LimitedLoginView(LoginView):
         if active_count >= settings.MAX_CONCURRENT_USERS:
             messages.error(
                 self.request,
-                "Maximum User Limit is reached. Please try later."
+                "Sorry. We have reached the maximum simultaneous user limit. Please try after some time.",
+                extra_tags="limit_error"
             )
             return redirect("account_login")
 
