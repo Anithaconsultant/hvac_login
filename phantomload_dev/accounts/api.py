@@ -1,10 +1,7 @@
-from datetime import datetime
-import traceback
+import random
 from num2words import num2words
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
+    TokenObtainPairView
 )
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
@@ -12,14 +9,10 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model, authenticate
-from .models import UserGameProgress
-from django.template.response import TemplateResponse
-from .serializers import CustomTokenObtainPairSerializer, RegisterSerializer, GameProgressSerializer
+from .serializers import  RegisterSerializer, GameProgressSerializer
 import pandas as pd
 import os
-import csv
 from django.conf import settings
-from rest_framework_simplejwt.authentication import JWTAuthentication
 import logging
 from num2words import num2words
 User = get_user_model()
@@ -134,23 +127,6 @@ class ClientLoginView(APIView):
                 return Response({'detail': 'User account is disabled.'}, status=status.HTTP_403_FORBIDDEN)
         else:
             return Response({'detail': 'Invalid password.'}, status=status.HTTP_401_UNAUTHORIZED)
-        # if user is not None and user.is_active:
-        #     refresh = RefreshToken.for_user(user)
-        #     token_data = {
-        #         'status': 'success',
-        #         'user_id': user.id,
-        #         'email': user.email,
-        #         'username': user.nickname,
-        #         'tokens': {
-        #             'access': str(refresh.access_token),
-        #             'refresh': str(refresh)
-        #         }
-        #     }
-        #     return TemplateResponse(request, 'home.html', token_data)
-        # elif user is not None and not user.is_active:
-        #     return Response({'detail': 'User account is disabled.'}, status=status.HTTP_403_FORBIDDEN)
-        # else:
-        #     return Response({'detail': 'Invalid password.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class UserDataView(APIView):
@@ -454,3 +430,136 @@ class FilterCSVDataTask09(APIView):
         except Exception as e:
             print("❌ ERROR:", str(e))
             return Response({"error": str(e)}, status=500)
+
+
+class ReadQandAexcel(APIView):
+    EXCEL_FILENAME = "PL_API Inputs_QA_Feature.xlsx"
+
+    def get(self, request):
+
+        # --- File Path ---
+        excel_path = os.path.join(
+            settings.BASE_DIR, 'staticfiles/docs/', self.EXCEL_FILENAME
+        )
+
+        if not os.path.exists(excel_path):
+            return Response(
+                {'error': f'File not found: {excel_path}'},
+                status=404
+            )
+
+        try:
+            # --- Read single-sheet Excel ---
+            df = pd.read_excel(excel_path)
+
+            # --- Clean basic empty values ---
+            df = df.dropna(how='all').fillna("")
+
+            # --- Convert DataFrame to JSON ---
+            data = df.to_dict(orient='records')
+
+            return Response({
+                'filename': self.EXCEL_FILENAME,
+                'row_count': len(data),
+                'data': data
+            })
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+        
+
+
+
+
+
+class ReadTask08excel(APIView):
+    EXCEL_FILENAME = "L1_T08_API data_V01.xlsx"
+
+    def get(self, request):
+
+        excel_path = os.path.join(
+            settings.BASE_DIR,
+            'staticfiles/docs/Task08/',
+            self.EXCEL_FILENAME
+        )
+
+        if not os.path.exists(excel_path):
+            return Response(
+                {'error': f'File not found: {excel_path}'},
+                status=404
+            )
+
+        try:
+            # --- Read Excel ---
+            df = pd.read_excel(excel_path)
+            df = df.dropna(how='all').fillna("")
+
+            # 🔥 IMPORTANT: normalize column names
+            df.columns = df.columns.str.strip().str.lower()
+
+            # --- Validate required columns ---
+            if 'zoneid' not in df.columns or 'active' not in df.columns:
+                return Response(
+                    {
+                        'error': 'Required columns missing after normalization',
+                        'columns_found': df.columns.tolist()
+                    },
+                    status=400
+                )
+
+            df['active'] = df['active'].astype(str)
+
+            # --- Process per zoneid ---
+            for zone_id in df['zoneid'].unique():
+
+                zone_rows = df[df['zoneid'] == zone_id]
+
+                false_rows = zone_rows[
+                    zone_rows['active'].str.startswith('FALSE_')
+                ]
+
+                for false_value in false_rows['active'].unique():
+
+                    group = false_rows[
+                        false_rows['active'] == false_value
+                    ]
+
+                    try:
+                        # Example: FALSE_03/05
+                        _, counts = false_value.split('_')
+                        select_count, _ = map(int, counts.split('/'))
+                    except ValueError:
+                        continue
+
+                    if select_count <= 0 or len(group) < select_count:
+                        continue
+
+                    selected_indices = random.sample(
+                        list(group.index),
+                        select_count
+                    )
+
+                    not_selected_indices = list(
+                        set(group.index) - set(selected_indices)
+                    )
+
+                    df.loc[selected_indices, 'active'] = 'TRUE'
+                    df.loc[not_selected_indices, 'active'] = 'FALSE'
+
+            data = df.to_dict(orient='records')
+
+            return Response({
+                'filename': self.EXCEL_FILENAME,
+                'row_count': len(data),
+                'data': data
+            })
+
+        except Exception as e:
+            import traceback
+            return Response(
+                {
+                    'error': str(e),
+                    'trace': traceback.format_exc()
+                },
+                status=500
+            )

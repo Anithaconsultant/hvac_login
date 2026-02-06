@@ -1,5 +1,7 @@
 .env
-
+venv/
+media/
+staticfiles/
 *.mp4
 *.mov
 *.avi

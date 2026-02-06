@@ -72,40 +72,6 @@ class LimitedLoginView(LoginView):
         return response
 
 
-# class LimitedLoginView(LoginView):
-#     template_name = "account/login.html"
-
-#     def form_valid(self, form):
-#         user = form.user  # FIXED
-
-#         # Count active sessions
-#         active_count = ActiveSession.objects.filter(
-#             logout_time__isnull=True
-#         ).count()
-
-#         if active_count >= settings.MAX_CONCURRENT_USERS:
-#             form.add_error(None, "Maximum user limit reached. Please try again later.")
-#             return super().form_invalid(form)
-
-#         # Create new session
-#         ActiveSession.objects.create(
-#             user=user,
-#             session_key=self.request.session.session_key
-#         )
-
-#         return super().form_valid(form)
-
-
-# class LimitedLogoutView(LogoutView):
-
-#     def dispatch(self, request, *args, **kwargs):
-#         ActiveSession.objects.filter(
-#             session_key=request.session.session_key,
-#             user=request.user,
-#             logout_time__isnull=True
-#         ).update(logout_time=timezone.now())
-
-#         return super().dispatch(request, *args, **kwargs)
 
 class CustomPasswordChangeView(PasswordChangeView):
     def form_valid(self, form):

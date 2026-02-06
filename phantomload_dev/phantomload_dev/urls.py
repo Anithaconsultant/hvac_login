@@ -18,7 +18,7 @@ from accounts.views import (
     CustomPasswordChangeView,
     LimitedLoginView
 )
-from accounts.api import CustomTokenObtainPairView, RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, FilterCSVDataTask09
+from accounts.api import CustomTokenObtainPairView, ReadTask08excel,ReadQandAexcel,RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, FilterCSVDataTask09
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
@@ -37,6 +37,10 @@ urlpatterns = [
     # path('api/read-excel/', ReadExcelStaticView.as_view(), name='read-excel'),
     path('api/task02-energybilldata/', ReadExcelAttemptView.as_view(),
          name='read_excel_attempt'),
+    path('api/QAdata/', ReadQandAexcel.as_view(),
+         name='ReadQandAexcel'),
+    path('api/task08-quizdata/', ReadTask08excel.as_view(),
+         name='ReadTask08excel'),
     path('api/filterdata-Task09/', FilterCSVDataTask09.as_view(),
          name='FilterCSVDataTask09'),
     path('admin/', admin.site.urls),
