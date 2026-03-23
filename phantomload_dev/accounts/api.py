@@ -15,6 +15,12 @@ import os
 from django.conf import settings
 import logging
 from num2words import num2words
+from rest_framework.decorators import api_view
+from .models import ActiveSession
+from .utils import can_user_login
+import uuid
+
+
 User = get_user_model()
 
 
@@ -64,6 +70,7 @@ class RegisterView(generics.CreateAPIView):
 logger = logging.getLogger(__name__)
 
 
+
 class GameProgressAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -93,6 +100,16 @@ class GameProgressAPIView(APIView):
                 "message": "Internal server error"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['POST'])
+def unity_logout(request):
+    session_key = request.data.get("session_key")
+
+    if not session_key:
+        return Response({"error": "session_key is required"}, status=400)
+
+    ActiveSession.objects.filter(session_key=session_key).delete()
+
+    return Response({"message": "Logged out successfully"})
 
 class ClientLoginView(APIView):
     """
@@ -102,6 +119,7 @@ class ClientLoginView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
+
         try:
             user = User.objects.get(email=username)
         except User.DoesNotExist:
@@ -111,23 +129,46 @@ class ClientLoginView(APIView):
 
         if user is not None:
             if user.is_active:
-                # Generate tokens manually
+
+                # ✅ STEP 1: CHECK GLOBAL LIMIT
+                allowed, error = can_user_login(user)
+
+                if not allowed:
+                    return Response({
+                        'detail': 'Maximum users reached. Try later.'
+                    }, status=status.HTTP_403_FORBIDDEN)
+
+                # ✅ STEP 2: CREATE UNITY SESSION
+                session_key = str(uuid.uuid4())
+
+                ActiveSession.objects.update_or_create(
+                    user=user,
+                    defaults={"session_key": session_key}
+                )
+
+                # ✅ STEP 3: GENERATE TOKENS (UNCHANGED)
                 refresh = RefreshToken.for_user(user)
+
                 return Response({
                     'status': 'success',
                     'user_id': user.id,
                     'email': user.email,
                     'username': user.nickname,
+
+                    # 🔥 OPTIONAL (good to send this)
+                    'session_key': session_key,
+
                     'tokens': {
                         'access': str(refresh.access_token),
                         'refresh': str(refresh)
                     }
                 }, status=status.HTTP_200_OK)
+
             else:
                 return Response({'detail': 'User account is disabled.'}, status=status.HTTP_403_FORBIDDEN)
+
         else:
             return Response({'detail': 'Invalid password.'}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 class UserDataView(APIView):
     def get(self, request, user_id):
@@ -224,20 +265,325 @@ class ReadExcelAttemptView(APIView):
             data = df.to_dict(orient='records')
 
             return Response({
-                'filename': self.EXCEL_FILENAME,
-                'sheet_name': sheet_names[sheet_index],
-                'total_sheets': len(sheet_names),
-                'row_count': len(data),
+             
                 'data': data
             })
 
         except Exception as e:
             return Response({'error': str(e)}, status=500)
 
-class FilterCSVDataTask09(APIView):
+
+class Task11TicketFixesApi(APIView):
 
     def get(self, request):
-        import random
+        file_name = "PL_L1_TASK11_Tickets_Fixes_Data_API.csv"
+        csv_path = os.path.join(
+            settings.BASE_DIR, "staticfiles/docs/Task11", file_name
+        )
+
+        if not os.path.exists(csv_path):
+            return Response(
+                {"error": "CSV file not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            df = pd.read_csv(csv_path, encoding="utf-8")
+
+            # Convert dataframe to records first
+            records = df.to_dict(orient="records")
+
+            cleaned_data = []
+
+            for row in records:
+                cleaned_row = {}
+
+                for key, value in row.items():
+
+                    # 🔴 CRITICAL FIX: handle NaN properly
+                    if pd.isna(value):
+                        continue
+
+                    if isinstance(value, str):
+                        value = value.strip()
+                        if value.lower() in ("", "na", "nan", "null"):
+                            continue
+
+                    cleaned_row[key] = value
+
+                if cleaned_row:
+                    cleaned_data.append(cleaned_row)
+
+            return Response(
+                {
+                    "count": len(cleaned_data),
+                    "data": cleaned_data
+                },
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class Task11LightingScenarioApi(APIView):
+
+    def get(self, request):
+        file_name = "PL_L1_TASK11_SF_Z25_Lighting_Scenario_Data_API.csv"
+        csv_path = os.path.join(
+            settings.BASE_DIR, "staticfiles/docs/Task11", file_name
+        )
+
+        if not os.path.exists(csv_path):
+            return Response(
+                {"error": "CSV file not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            df = pd.read_csv(csv_path, encoding="utf-8")
+
+            # Convert dataframe to records first
+            records = df.to_dict(orient="records")
+
+            cleaned_data = []
+
+            for row in records:
+                cleaned_row = {}
+
+                for key, value in row.items():
+
+                    # 🔴 CRITICAL FIX: handle NaN properly
+                    if pd.isna(value):
+                        continue
+
+                    if isinstance(value, str):
+                        value = value.strip()
+                        if value.lower() in ("", "na", "nan", "null"):
+                            continue
+
+                    cleaned_row[key] = value
+
+                if cleaned_row:
+                    cleaned_data.append(cleaned_row)
+
+            return Response(
+                {
+                    "count": len(cleaned_data),
+                    "data": cleaned_data
+                },
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+# class Task11LightFixtureApi(APIView):
+
+#     def get(self, request):
+#         import random
+
+#         # -------------------------------------------------------------------
+#         # Validate attempt parameter
+#         # -------------------------------------------------------------------
+#         attempt = request.query_params.get("attempt")
+#         if not attempt:
+#             return Response({"error": "Attempt parameter is required."}, status=400)
+
+#         try:
+#             attempt_num = int(attempt)
+#         except ValueError:
+#             return Response({"error": "Attempt must be an integer."}, status=400)
+
+#         base_dir = os.path.join(settings.BASE_DIR, "staticfiles", "docs", "Task11")
+
+#         # -------------------------------------------------------------------
+#         # CSV file definitions
+#         # -------------------------------------------------------------------
+#         files = {
+#             "mask": f"PL_L1_TASK11_LightFixtureAPI_TF_Masks_Attempt{attempt_num}.csv",
+#             "sources": f"PL_L1_TASK11_LightFixtureAPI_Sources_Attempt{attempt_num}.csv",
+#             "points": f"PL_L1_TASK11_LightFixtureAPI_Points_Attempt{attempt_num}.csv",
+#             "name_value": f"PL_L1_TASK11_LightFixtureAPI_Name_Value_Attempt{attempt_num}.csv",
+#             "destinations": f"PL_L1_TASK11_LightFixtureAPI_Destinations_Attempt{attempt_num}.csv",
+#         }
+
+#         # Check file existence
+#         for key, fname in files.items():
+#             if not os.path.exists(os.path.join(base_dir, fname)):
+#                 return Response({"error": f"File not found: {fname}"}, status=404)
+
+#         try:
+#             # -------------------------------------------------------------------
+#             # Load mask CSV
+#             # -------------------------------------------------------------------
+#             mask_df = pd.read_csv(os.path.join(base_dir, files["mask"]))
+#             mask_df = mask_df.fillna('').infer_objects(copy=False)
+#             mask_df = mask_df.map(
+#                 lambda x: str(x).strip().lower() in ["true", "1", "yes"]
+#                 if pd.notna(x)
+#                 else False
+#             )
+
+#             # -------------------------------------------------------------------
+#             # Load other CSVs
+#             # -------------------------------------------------------------------
+#             dataframes = {
+#                 name: pd.read_csv(os.path.join(base_dir, fname)).fillna("")
+#                 for name, fname in files.items()
+#                 if name != "mask"
+#             }
+
+#             # -------------------------------------------------------------------
+#             # Fields that appear only once
+#             # -------------------------------------------------------------------
+#             common_fields = [
+#                 "Game Level",
+#                 "Task #",
+#                 "Floor",
+#                 "Room ID",
+#                 "Room",
+#                 "Equipment",
+#                 "HotSpotID",
+#                 "ActiveZone",
+#             ]
+
+#             # -------------------------------------------------------------------
+#             # Define Random Zone Sets
+#             # -------------------------------------------------------------------
+#             zone_set_1 = [("GF", "Z15"), ("GF", "Z16"), ("GF", "Z18"), ("SF", "Z27")]
+#             zone_set_2 = [("GF", "Z04"), ("GF", "Z10"), ("FF", "Z02"), ("FF", "Z08")]
+#             zone_set_3 = [("FF", "Z11"), ("FF", "Z06")]
+
+#             selected_zone_1 = random.choice(zone_set_1)
+#             selected_zone_2 = random.choice(zone_set_2)
+#             selected_zone_3 = random.choice(zone_set_3)
+
+#             selected_zones = {
+#                 selected_zone_1,
+#                 selected_zone_2,
+#                 selected_zone_3,
+#             }
+
+#             # -------------------------------------------------------------------
+#             # Dynamic size detection
+#             # -------------------------------------------------------------------
+#             max_rows = max(len(df) for df in dataframes.values())
+#             max_cols = min(
+#                 len(mask_df.columns),
+#                 max(len(df.columns) for df in dataframes.values())
+#             )
+
+#             merged_data = []
+
+#             # -------------------------------------------------------------------
+#             # MERGING LOOP
+#             # -------------------------------------------------------------------
+#             for i in range(max_rows):
+
+#                 row_record = {"row": i + 1}
+#                 temp_dict = {}
+#                 has_valid_data = False
+
+#                 for sheet_name, df in dataframes.items():
+
+#                     if i >= len(df):
+#                         continue
+
+#                     for j in range(min(len(df.columns), max_cols)):
+
+#                         # Mask check
+#                         mask_value = bool(mask_df.iloc[i, j]) if i < len(mask_df) else False
+#                         if not mask_value:
+#                             continue
+
+#                         col_name = str(df.columns[j]).strip()
+#                         value = df.iloc[i, j]
+
+#                         if str(value).strip() == "":
+#                             continue
+
+#                         # Convert points
+#                         if sheet_name == "points":
+#                             try:
+#                                 value = int(float(value))
+#                             except:
+#                                 pass
+
+#                         # Common fields only once
+#                         if col_name in common_fields:
+#                             if col_name not in row_record:
+#                                 row_record[col_name] = value
+#                             continue
+
+#                         # Initialize merged bucket
+#                         if col_name not in temp_dict:
+#                             temp_dict[col_name] = {
+#                                 "Sources": [],
+#                                 "Points": [],
+#                                 "Name_Value": [],
+#                                 "Destinations": [],
+#                             }
+
+#                         sheet_key = {
+#                             "sources": "Sources",
+#                             "points": "Points",
+#                             "name_value": "Name_Value",
+#                             "destinations": "Destinations",
+#                         }.get(sheet_name)
+
+#                         temp_dict[col_name][sheet_key].append(value)
+#                         has_valid_data = True
+
+#                 # Add merged columns
+#                 for key, val in temp_dict.items():
+#                     cleaned = {k: v for k, v in val.items() if v}
+#                     if cleaned:
+#                         row_record[key] = cleaned
+
+#                 # Add only used rows
+#                 if has_valid_data:
+#                     merged_data.append(row_record)
+
+#             # -------------------------------------------------------------------
+#             # APPLY ACTIVE ZONE AFTER BUILDING ALL ROWS
+#             # -------------------------------------------------------------------
+#             for row in merged_data:
+#                 floor_val = str(row.get("Floor", "")).strip()
+#                 room_val = str(row.get("Room ID", "")).strip()
+
+#                 if (floor_val, room_val) in selected_zones:
+#                     row["ActiveZone"] = True
+#                 else:
+#                     row["ActiveZone"] = False
+
+#             # -------------------------------------------------------------------
+#             # Response
+#             # -------------------------------------------------------------------
+#             return Response(
+#                 {
+#                     "attempt": attempt_num,
+#                     "selected_zones": list(selected_zones),
+#                     "files": files,
+#                     "total_rows": len(merged_data),
+#                     "data": merged_data,
+#                 },
+#                 status=200,
+#             )
+
+#         except Exception as e:
+#             print("❌ ERROR:", str(e))
+#             return Response({"error": str(e)}, status=500)
+
+class Task11LightFixtureApi(APIView):
+
+    def get(self, request):
+       
 
         # -------------------------------------------------------------------
         # Validate attempt parameter
@@ -251,27 +597,29 @@ class FilterCSVDataTask09(APIView):
         except ValueError:
             return Response({"error": "Attempt must be an integer."}, status=400)
 
-        base_dir = os.path.join(settings.BASE_DIR, "staticfiles", "docs", "Task09")
+        base_dir = os.path.join(settings.BASE_DIR, "staticfiles", "docs", "Task11")
 
         # -------------------------------------------------------------------
         # CSV file definitions
         # -------------------------------------------------------------------
         files = {
-            "mask": f"PL_L1_TASK09_TF_Mask_Attempt{attempt_num}.csv",
-            "sources": f"PL_L1_TASK09_Sources_Attempt{attempt_num}.csv",
-            "points": f"PL_L1_TASK09_Points_Attempt{attempt_num}.csv",
-            "name_value": f"PL_L1_TASK09_Name_Value_Attempt{attempt_num}.csv",
-            "destinations": f"PL_L1_TASK09_Destinations_Attempt{attempt_num}.csv",
+            "mask": f"PL_L1_TASK11_LightFixtureAPI_TF_Masks_Attempt{attempt_num}.csv",
+            "sources": f"PL_L1_TASK11_LightFixtureAPI_Sources_Attempt{attempt_num}.csv",
+            "points": f"PL_L1_TASK11_LightFixtureAPI_Points_Attempt{attempt_num}.csv",
+            "name_value": f"PL_L1_TASK11_LightFixtureAPI_Name_Value_Attempt{attempt_num}.csv",
+            "destinations": f"PL_L1_TASK11_LightFixtureAPI_Destinations_Attempt{attempt_num}.csv",
         }
 
+        # -------------------------------------------------------------------
         # Check file existence
-        for key, fname in files.items():
+        # -------------------------------------------------------------------
+        for fname in files.values():
             if not os.path.exists(os.path.join(base_dir, fname)):
                 return Response({"error": f"File not found: {fname}"}, status=404)
 
         try:
             # -------------------------------------------------------------------
-            # Load mask CSV
+            # Load TF Mask CSV (SOURCE OF TRUTH)
             # -------------------------------------------------------------------
             mask_df = pd.read_csv(os.path.join(base_dir, files["mask"]))
             mask_df = mask_df.fillna('').infer_objects(copy=False)
@@ -291,46 +639,32 @@ class FilterCSVDataTask09(APIView):
             }
 
             # -------------------------------------------------------------------
-            # Fields that appear only once
+            # Fields removed completely
             # -------------------------------------------------------------------
-            common_fields = [
-                "Game Level",
-                "Task #",
-                "Floor",
-                "Room ID",
-                "Room",
-                "Equipment",
-                "HotSpotID",
-                "ActiveZone",
-            ]
-
-            # -------------------------------------------------------------------
-            # Define Random Zone Sets
-            # -------------------------------------------------------------------
-            zone_set_1 = [("GF", "Z15"), ("GF", "Z16"), ("GF", "Z18"), ("SF", "Z27")]
-            zone_set_2 = [("GF", "Z04"), ("GF", "Z10"), ("FF", "Z02"), ("FF", "Z08")]
-            zone_set_3 = [("FF", "Z11"), ("FF", "Z06")]
-
-            selected_zone_1 = random.choice(zone_set_1)
-            selected_zone_2 = random.choice(zone_set_2)
-            selected_zone_3 = random.choice(zone_set_3)
-
-            selected_zones = {
-                selected_zone_1,
-                selected_zone_2,
-                selected_zone_3,
+            removed_fields = {
+                "GameLevel",
+                "TaskNo",
             }
 
             # -------------------------------------------------------------------
-            # Dynamic size detection
+            # Fields allowed ONLY when masked true
             # -------------------------------------------------------------------
+            conditional_common_fields = {
+                "Floor",
+                "RoomID",
+                "RoomName",
+                "Equipment",
+                "HotSpotID",
+                "IsActiveZone",
+            }
+
+            merged_data = []
+
             max_rows = max(len(df) for df in dataframes.values())
             max_cols = min(
                 len(mask_df.columns),
                 max(len(df.columns) for df in dataframes.values())
             )
-
-            merged_data = []
 
             # -------------------------------------------------------------------
             # MERGING LOOP
@@ -349,8 +683,7 @@ class FilterCSVDataTask09(APIView):
                     for j in range(min(len(df.columns), max_cols)):
 
                         # Mask check
-                        mask_value = bool(mask_df.iloc[i, j]) if i < len(mask_df) else False
-                        if not mask_value:
+                        if i >= len(mask_df) or not bool(mask_df.iloc[i, j]):
                             continue
 
                         col_name = str(df.columns[j]).strip()
@@ -366,20 +699,26 @@ class FilterCSVDataTask09(APIView):
                             except:
                                 pass
 
-                        # Common fields only once
-                        if col_name in common_fields:
-                            if col_name not in row_record:
-                                row_record[col_name] = value
+                        # ❌ Skip removed fields always
+                        if col_name in removed_fields:
                             continue
 
-                        # Initialize merged bucket
+                        # ✅ Conditional common fields (only if masked true)
+                        if col_name in conditional_common_fields:
+
+                            if col_name == "IsActiveZone":
+                                row_record["IsActiveZone"] = True
+                            else:
+                                row_record[col_name] = value
+
+                            has_valid_data = True
+                            continue
+
+                        # -------------------------------------------------------------------
+                        # Normal merged fields
+                        # -------------------------------------------------------------------
                         if col_name not in temp_dict:
-                            temp_dict[col_name] = {
-                                "Sources": [],
-                                "Points": [],
-                                "Name_Value": [],
-                                "Destinations": [],
-                            }
+                            temp_dict[col_name] = {}
 
                         sheet_key = {
                             "sources": "Sources",
@@ -388,41 +727,33 @@ class FilterCSVDataTask09(APIView):
                             "destinations": "Destinations",
                         }.get(sheet_name)
 
-                        temp_dict[col_name][sheet_key].append(value)
+                        # Convert value properly
+                        if sheet_name == "points":
+                            try:
+                                value = int(float(value))
+                            except:
+                                pass
+
+                        if sheet_name == "name_value":
+                            value = str(value)  # ALWAYS string
+
+                        temp_dict[col_name][sheet_key] = value
                         has_valid_data = True
 
                 # Add merged columns
                 for key, val in temp_dict.items():
-                    cleaned = {k: v for k, v in val.items() if v}
-                    if cleaned:
-                        row_record[key] = cleaned
+                    if val:
+                        row_record[key] = val
 
-                # Add only used rows
                 if has_valid_data:
                     merged_data.append(row_record)
-
-            # -------------------------------------------------------------------
-            # APPLY ACTIVE ZONE AFTER BUILDING ALL ROWS
-            # -------------------------------------------------------------------
-            for row in merged_data:
-                floor_val = str(row.get("Floor", "")).strip()
-                room_val = str(row.get("Room ID", "")).strip()
-
-                if (floor_val, room_val) in selected_zones:
-                    row["ActiveZone"] = True
-                else:
-                    row["ActiveZone"] = False
 
             # -------------------------------------------------------------------
             # Response
             # -------------------------------------------------------------------
             return Response(
                 {
-                    "attempt": attempt_num,
-                    "selected_zones": list(selected_zones),
-                    "files": files,
-                    "total_rows": len(merged_data),
-                    "data": merged_data,
+                    "data": merged_data
                 },
                 status=200,
             )
@@ -430,7 +761,6 @@ class FilterCSVDataTask09(APIView):
         except Exception as e:
             print("❌ ERROR:", str(e))
             return Response({"error": str(e)}, status=500)
-
 
 class ReadQandAexcel(APIView):
     EXCEL_FILENAME = "PL_API Inputs_QA_Feature.xlsx"
@@ -470,10 +800,8 @@ class ReadQandAexcel(APIView):
 
 
 
-
-
 class ReadTask08excel(APIView):
-    EXCEL_FILENAME = "L1_T08_API data_V01.xlsx"
+    EXCEL_FILENAME = "L1_T08_API data.xlsx"
 
     def get(self, request):
 
@@ -494,8 +822,36 @@ class ReadTask08excel(APIView):
             df = pd.read_excel(excel_path)
             df = df.dropna(how='all').fillna("")
 
-            # 🔥 IMPORTANT: normalize column names
+            # --- Normalize column names ---
             df.columns = df.columns.str.strip().str.lower()
+
+            # --------------------------------------------------
+            # Convert correct answer columns to INT (1 / 0)
+            # --------------------------------------------------
+            correct_cols = [
+                'iscorrectanswer',
+                'iscorrectanswer.1',
+                'iscorrectanswer.2',
+                'iscorrectanswer.3'
+            ]
+
+            for col in correct_cols:
+                if col in df.columns:
+
+                    df[col] = pd.to_numeric(df[col], errors='coerce')
+
+                    df[col] = df[col].apply(
+                        lambda x: int(x) if pd.notna(x) else None
+                    )
+
+            # --------------------------------------------------
+            # Convert Y and Z columns to FLOAT
+            # --------------------------------------------------
+            float_cols = ['initialsetpointtemp', 'initialroomtemp']
+
+            for col in float_cols:
+                if col in df.columns:
+                    df[col] = pd.to_numeric(df[col], errors='coerce').astype(float)
 
             # --- Validate required columns ---
             if 'zoneid' not in df.columns or 'active' not in df.columns:
@@ -507,9 +863,15 @@ class ReadTask08excel(APIView):
                     status=400
                 )
 
-            df['active'] = df['active'].astype(str)
+            # --- Normalize active column safely ---
+            df['active'] = (
+                df['active']
+                .astype(str)
+                .str.strip()
+                .str.upper()
+            )
 
-            # --- Process per zoneid ---
+            # ================= RANDOMIZATION LOGIC =================
             for zone_id in df['zoneid'].unique():
 
                 zone_rows = df[df['zoneid'] == zone_id]
@@ -525,7 +887,6 @@ class ReadTask08excel(APIView):
                     ]
 
                     try:
-                        # Example: FALSE_03/05
                         _, counts = false_value.split('_')
                         select_count, _ = map(int, counts.split('/'))
                     except ValueError:
@@ -545,13 +906,45 @@ class ReadTask08excel(APIView):
 
                     df.loc[selected_indices, 'active'] = 'TRUE'
                     df.loc[not_selected_indices, 'active'] = 'FALSE'
+            # =======================================================
 
-            data = df.to_dict(orient='records')
+            # --- Send ONLY TRUE rows ---
+            df_true = df[
+                df['active'] == 'TRUE'
+            ].copy()
+
+            # --- Remove first 2 columns ---
+            df_true = df_true.iloc[:, 2:]
+
+            # --- Remove 'active' column from response ---
+            if 'active' in df_true.columns:
+                df_true = df_true.drop(columns=['active'])
+
+            # --- Remove empty / NA / "Null" values and keys ---
+            cleaned_data = []
+
+            for _, row in df_true.iterrows():
+
+                row_dict = {}
+
+                for key, value in row.items():
+
+                    if (
+                        value not in ["", None]
+                        and not pd.isna(value)
+                        and str(value).strip().lower() != "null"
+                    ):
+
+                        # FIX: ensure iscorrectanswer values are INT not FLOAT
+                        if "iscorrectanswer" in key:
+                            value = int(value)
+
+                        row_dict[key] = value
+
+                cleaned_data.append(row_dict)
 
             return Response({
-                'filename': self.EXCEL_FILENAME,
-                'row_count': len(data),
-                'data': data
+                'data': cleaned_data
             })
 
         except Exception as e:

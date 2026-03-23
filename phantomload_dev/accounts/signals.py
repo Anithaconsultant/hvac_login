@@ -10,7 +10,11 @@ from .models import ActiveSession
 
 @receiver(user_logged_out)
 def clear_active_session(sender, request, user, **kwargs):
-    ActiveSession.objects.filter(user=user).delete()
+    if user:  # ✅ avoid None issues
+        ActiveSession.objects.filter(user=user).delete()
+    
+    
+    
 User = get_user_model()
 
 @receiver(post_save, sender=User)

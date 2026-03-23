@@ -18,7 +18,7 @@ from accounts.views import (
     CustomPasswordChangeView,
     LimitedLoginView
 )
-from accounts.api import CustomTokenObtainPairView, ReadTask08excel,ReadQandAexcel,RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, FilterCSVDataTask09
+from accounts.api import Task11LightingScenarioApi,unity_logout,CustomTokenObtainPairView,Task11TicketFixesApi, ReadTask08excel,ReadQandAexcel,RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, Task11LightFixtureApi
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
@@ -41,8 +41,12 @@ urlpatterns = [
          name='ReadQandAexcel'),
     path('api/task08-quizdata/', ReadTask08excel.as_view(),
          name='ReadTask08excel'),
-    path('api/filterdata-Task09/', FilterCSVDataTask09.as_view(),
-         name='FilterCSVDataTask09'),
+    path('api/task11-lightfixturedata/', Task11LightFixtureApi.as_view(),
+         name='Task11LightFixtureApi'),
+    path('api/task11-ticketFixesApi/', Task11TicketFixesApi.as_view(),
+         name='Task11TicketFixesApi'),
+    path('api/task11-lightingScenarioApi/', Task11LightingScenarioApi.as_view(),
+         name='Task11LightingScenarioApi'),
     path('admin/', admin.site.urls),
     path('accounts/signup/', CustomSignupView.as_view(), name='account_signup'),
     # path('accounts/login/', LoginView.as_view(), name='account_login'),
@@ -65,6 +69,7 @@ urlpatterns = [
     path('home/', views.home_view, name='home'),  # Actual home page view
     path('api/users/', views.UserListView.as_view(), name='user-list'),
     path('api/client-login/', ClientLoginView.as_view(), name='client-login'),
+    path('api/unity-logout/', unity_logout, name='unity_logout'),
 
     path('download_windows/', views.download_windows, name='download_windows'),
     path('download-mac/', views.download_mac, name='download_mac'),
@@ -76,6 +81,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('credits/', views.credits, name='credits'),
     path('profile/', views.profile, name='profile'),
+     
     # path('test_email/', views.test_email, name='test_email'),
     path('user_data/<str:user_id>/', UserDataView.as_view(), name='user-data'),
 

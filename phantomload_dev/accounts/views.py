@@ -26,6 +26,7 @@ from django.contrib.sessions.models import Session
 from django.conf import settings
 from django.dispatch import receiver
 from django.utils import timezone
+from .utils import can_user_login
 
 # limit to 10 total logged-in users
 
@@ -37,40 +38,33 @@ class LimitedLoginView(LoginView):
     def form_valid(self, form):
         user = form.user
 
-        # 🔒 If user is already authenticated, allow (no slot check)
-        if self.request.user.is_authenticated:
-            return super().form_valid(form)
+        # ✅ STEP 4.1: Check limit
+        allowed, error = can_user_login(user)
 
-        # 🔒 If user already has a reserved slot, allow
-        if ActiveSession.objects.filter(user=user).exists():
-            return super().form_valid(form)
-
-        # 🔢 Count active users
-        active_count = ActiveSession.objects.count()
-        print("ACTIVE COUNT:", active_count)
-
-        if active_count >= settings.MAX_CONCURRENT_USERS:
+        if not allowed:
             messages.error(
                 self.request,
-                "Sorry. We have reached the maximum simultaneous user limit. Please try after some time.",
+                "Maximum users reached. Try later.",
                 extra_tags="limit_error"
             )
             return redirect("account_login")
 
-        # ✅ Allow login
+        # ✅ STEP 4.2: Login normally
         response = super().form_valid(form)
 
-        # Ensure session exists
+        # ✅ STEP 4.3: Ensure session exists
         if not self.request.session.session_key:
             self.request.session.create()
 
-        ActiveSession.objects.create(
+        # ✅ STEP 4.4: Store session (IMPORTANT)
+        ActiveSession.objects.update_or_create(
             user=user,
-            session_key=self.request.session.session_key
+            defaults={
+                "session_key": self.request.session.session_key
+            }
         )
 
         return response
-
 
 
 class CustomPasswordChangeView(PasswordChangeView):

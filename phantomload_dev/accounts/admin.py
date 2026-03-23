@@ -35,7 +35,8 @@ from .models import ActiveSession
 
 @admin.register(ActiveSession)
 class ActiveSessionAdmin(admin.ModelAdmin):
-    list_display = ("user", "login_time")
+    list_display = ("user", "session_key", "login_time")
+    search_fields = ("user__username", "user__email")
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
