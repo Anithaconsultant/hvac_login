@@ -27,11 +27,12 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.utils import timezone
 from .utils import can_user_login
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 # limit to 10 total logged-in users
-
+from django.contrib.auth import get_user_model
 from allauth.account.views import LoginView
-
+User = get_user_model()
 
 class LimitedLoginView(LoginView):
 
@@ -295,6 +296,90 @@ def update_game_progress(request):
     )
 
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.contrib.auth import get_user_model
+from .models import UserGameProgress, LoadShredderRecord
+
+User = get_user_model()
+
+
+@csrf_exempt
+def reset_game_progress(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+
+            user_id = data.get('user_id')
+            if not user_id:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'user_id is required'
+                }, status=400)
+
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'User not found'
+                }, status=404)
+
+            # =========================
+            # ✅ RESET UserGameProgress
+            # =========================
+            progress_updated = UserGameProgress.objects.filter(user=user).update(
+                completion_status='not_started',
+                points_scored=None,
+                time_taken=None,
+                max_points=None,
+                hint_penalty_points=0,
+                bonus_points=0,
+                tools_earned=[],
+                badges=[],
+                super_powers=[]
+            )
+
+            # =========================
+            # ✅ RESET LoadShredderRecord
+            # =========================
+            shredder_records = LoadShredderRecord.objects.filter(user=user).order_by('attempt_number')
+
+            actual_counter = 1
+
+            for record in shredder_records:
+                record.score = 0
+                record.status = 'not_started'
+                record.place = ""
+                record.starting_case = ""
+                record.current_sf_tr = 0
+
+                # 🔁 reset attempt rotation properly
+                record.actual_attempt_number = actual_counter
+                record.attempt_number = ((actual_counter - 1) % 3) + 1
+
+                record.save()
+                actual_counter += 1
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Game + Load Shredder reset successfully',
+                'progress_updated': progress_updated,
+                'shredder_records_reset': shredder_records.count()
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Only POST allowed'
+    }, status=405)
+    
 @login_required
 def view_progress(request):
     progress_data = UserGameProgress.objects.filter(
@@ -325,7 +410,7 @@ def view_progress(request):
         )
         progress.super_powers_list = [power.strip()
                                       for power in powers if power.strip()]
-
+        
     return render(request, 'progress_data.html', {'progress_data': progress_data})
 
 

@@ -75,7 +75,26 @@ class CustomUser(AbstractUser):
         return self.email
 
 
+    
 User = get_user_model()
+
+
+
+class LoadShredderRecord(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    place = models.CharField(max_length=255)
+    starting_case = models.CharField(max_length=255)
+    current_sf_tr = models.FloatField()
+    status = models.CharField(max_length=50)  # simple string (no choices)
+    score = models.FloatField()
+    attempt_number = models.IntegerField()
+    actual_attempt_number = models.IntegerField()
+    class Meta:
+        unique_together = ('user', 'attempt_number')
+   
+    def __str__(self):
+        return f"{self.place} - {self.status}"
+    
 class UserGameProgress(models.Model):
     COMPLETION_STATUS_CHOICES = [
         ('not_started', 'Not Started'),
@@ -129,3 +148,6 @@ class UserGameProgress(models.Model):
     #             self.super_powers = []
                 
     #     super().save(*args, **kwargs)
+    
+    
+ 

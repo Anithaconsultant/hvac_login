@@ -32,3 +32,11 @@ def create_user_game_progress(sender, instance, created, **kwargs):
                         completion_status='not_started',
                         # Other fields will use their defaults (null/blank/default values)
                     )
+        for attempt in range(1, 4):
+            UserGameProgress.objects.create(
+                user=instance,
+                level=1,
+                attempt_number=attempt,
+                task_number="Load_Shredder",  # 👈 your custom task
+                completion_status='not_started',
+            )

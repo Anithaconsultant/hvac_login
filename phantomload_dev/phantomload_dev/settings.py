@@ -26,8 +26,6 @@ SECRET_KEY = 'django-insecure-(e$3t!sosz9mwqmwc)wccqc2pc!2r8x=%e96=!$gka9f4#ag69
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-from dotenv import load_dotenv
-import os
 
 # Application definition
 
@@ -177,10 +175,13 @@ LOGIN_REDIRECT_URL = '/home/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 
 load_dotenv()
-
+print("EMAIL:", os.getenv("EMAIL_HOST_USER"))
+print("PASS:", os.getenv("EMAIL_HOST_PASSWORD"))
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+from django.core.mail import send_mail
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

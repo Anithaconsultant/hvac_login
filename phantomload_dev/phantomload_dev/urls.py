@@ -16,9 +16,10 @@ from accounts.views import (
     CustomConfirmEmailView,
     CustomSignupView,
     CustomPasswordChangeView,
-    LimitedLoginView
+    LimitedLoginView,
+    reset_game_progress
 )
-from accounts.api import Task11LightingScenarioApi,unity_logout,CustomTokenObtainPairView,Task11TicketFixesApi, ReadTask08excel,ReadQandAexcel,RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, Task11LightFixtureApi
+from accounts.api import get_userprogress,save_loadshredder_full,get_loadshredder_data,get_username,Task11LightingScenarioApi,unity_logout,CustomTokenObtainPairView,Task11TicketFixesApi, ReadTask08excel,ReadQandAexcel,RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, Task11LightFixtureApi
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
@@ -29,11 +30,7 @@ from accounts import views
 from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
-    path('api/token/', CustomTokenObtainPairView.as_view(),
-         name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('api/register/', RegisterView.as_view(), name='register'),
+    path('api/client-login/', ClientLoginView.as_view(), name='client-login'),
     # path('api/read-excel/', ReadExcelStaticView.as_view(), name='read-excel'),
     path('api/task02-energybilldata/', ReadExcelAttemptView.as_view(),
          name='read_excel_attempt'),
@@ -52,11 +49,7 @@ urlpatterns = [
     # path('accounts/login/', LoginView.as_view(), name='account_login'),
     path('accounts/login/', LimitedLoginView.as_view(),
          name='account_login'),   # UPDATED
-    path(
-        "accounts/login/",
-        LimitedLoginView.as_view(),
-        name="account_login"
-    ),
+    
 
     path("accounts/password/change/", CustomPasswordChangeView.as_view(),
          name="account_change_password"),
@@ -68,7 +61,7 @@ urlpatterns = [
     path('', views.home_redirect, name='redirect-root'),  # Temporary redirect
     path('home/', views.home_view, name='home'),  # Actual home page view
     path('api/users/', views.UserListView.as_view(), name='user-list'),
-    path('api/client-login/', ClientLoginView.as_view(), name='client-login'),
+
     path('api/unity-logout/', unity_logout, name='unity_logout'),
 
     path('download_windows/', views.download_windows, name='download_windows'),
@@ -84,6 +77,11 @@ urlpatterns = [
      
     # path('test_email/', views.test_email, name='test_email'),
     path('user_data/<str:user_id>/', UserDataView.as_view(), name='user-data'),
+    path('api/get-username/', get_username, name='get_username'),
+    path('api/loadshredderdata/', get_loadshredder_data, name='get_loadshredder_data'),
+    path('api/get_userprogressdata/', get_userprogress, name='get_userprogress'),
+    path('api/save-loadshredderscore/', save_loadshredder_full, name='save_loadshredder_full'),
+    path('api/reset_game_progress/', reset_game_progress, name='reset_game_progress')
 
 ]
 

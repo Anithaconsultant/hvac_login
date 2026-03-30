@@ -16,10 +16,10 @@ from django.conf import settings
 import logging
 from num2words import num2words
 from rest_framework.decorators import api_view
-from .models import ActiveSession
+from .models import ActiveSession,LoadShredderRecord,UserGameProgress
 from .utils import can_user_login
 import uuid
-
+from django.db import transaction
 
 User = get_user_model()
 
@@ -110,6 +110,7 @@ def unity_logout(request):
     ActiveSession.objects.filter(session_key=session_key).delete()
 
     return Response({"message": "Logged out successfully"})
+
 
 class ClientLoginView(APIView):
     """
@@ -956,3 +957,167 @@ class ReadTask08excel(APIView):
                 },
                 status=500
             )
+            
+def get_username_from_email(email):
+    try:
+        user = User.objects.get(email=email)
+        print(user)
+        return user.first_name+' '+user.last_name
+    except User.DoesNotExist:
+        return None
+    
+@api_view(['POST'])
+def get_username(request):
+    email = request.data.get('email')
+    print(email)
+    username = get_username_from_email(email)
+    print(username)
+    return Response({
+        "username": username
+    })
+    
+@api_view(['GET'])
+def get_userprogress(request):
+
+    user_id = request.GET.get('user_id')
+
+    if not user_id:
+        return Response({"error": "user_id is required"}, status=400)
+
+    progress_data = UserGameProgress.objects.filter(
+        user_id=user_id
+    ).exclude(
+        completion_status="not_started"
+    ).order_by('level', 'attempt_number', 'task_number').values()
+
+    return Response({
+        "data": list(progress_data)
+    })
+
+User = get_user_model()
+
+
+@api_view(['GET'])
+def get_loadshredder_data(request):
+    user_id = request.GET.get('user_id')
+
+    if not user_id:
+        return Response({"error": "user_id is required"}, status=400)
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+    records = LoadShredderRecord.objects.filter(user=user).order_by('actual_attempt_number')
+
+    data = []
+    for record in records:
+        data.append({
+            "attempt_number": record.attempt_number,
+            "place": record.place,
+            "starting_case": record.starting_case,
+            "current_sf_tr": record.current_sf_tr,
+            "status": record.status,
+            "score": record.score
+        })
+
+    return Response({
+        "user_id": user.id,
+        "email": user.email,
+        "total_attempts": records.count(),
+        "data": data
+    })
+    
+    
+@api_view(['POST'])
+def save_loadshredder_full(request):
+    data = request.data
+    email = data.get('email')
+
+    if not email:
+        return Response({"error": "email is required"}, status=400)
+
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+    # 🔒 ensure both tables update together
+    with transaction.atomic():
+
+        # =========================
+        # ✅ STEP 1: Calculate attempt
+        # =========================
+        last_attempt = LoadShredderRecord.objects.filter(user=user).order_by('-actual_attempt_number').first()
+
+        if last_attempt:
+            actual_attempt_number = last_attempt.actual_attempt_number + 1
+        else:
+            actual_attempt_number = 1
+
+        attempt_number = ((actual_attempt_number - 1) % 3) + 1
+
+        # =========================
+        # ✅ STEP 2: Update LoadShredderRecord
+        # =========================
+        existing_record = LoadShredderRecord.objects.filter(
+            user=user,
+            attempt_number=attempt_number
+        ).first()
+
+        if existing_record:
+            existing_record.actual_attempt_number = actual_attempt_number
+            existing_record.place = data.get('place')
+            existing_record.starting_case = data.get('starting_case')
+            existing_record.current_sf_tr = data.get('current_sf_tr')
+            existing_record.status = data.get('status')
+            existing_record.score = data.get('score')
+            existing_record.save()
+        else:
+            LoadShredderRecord.objects.create(
+                user=user,
+                attempt_number=attempt_number,
+                actual_attempt_number=actual_attempt_number,
+                place=data.get('place'),
+                starting_case=data.get('starting_case'),
+                current_sf_tr=data.get('current_sf_tr'),
+                status=data.get('status'),
+                score=data.get('score')
+            )
+
+        # =========================
+        # ✅ STEP 3: Update UserGameProgress (SYNCED)
+        # =========================
+        attempt_row = UserGameProgress.objects.filter(
+            user=user,
+            level=1,
+            task_number="Load_Shredder",
+            attempt_number=attempt_number
+        ).first()
+
+        if attempt_row:
+            attempt_row.points_scored = data.get('score')
+            attempt_row.completion_status = data.get('status')
+            attempt_row.time_taken = data.get('time_taken', '10s')
+            attempt_row.max_points = data.get('max_points', 700)
+            attempt_row.hint_penalty_points = 0
+            attempt_row.bonus_points = 0
+            attempt_row.tools_earned = []
+            attempt_row.badges = []
+            attempt_row.super_powers = []
+            attempt_row.save()
+
+        else:
+            return Response({
+                "error": f"No matching progress row for attempt {attempt_number}"
+            }, status=404)
+
+    # =========================
+    # ✅ FINAL RESPONSE
+    # =========================
+    return Response({
+        "message": "Saved successfully in both tables",
+        "attempt_used": attempt_number,
+        "actual_attempt_number": actual_attempt_number
+    })
