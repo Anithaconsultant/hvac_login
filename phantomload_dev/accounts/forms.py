@@ -8,14 +8,13 @@ from django.core.exceptions import ValidationError
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field
 import json
-
-
+import re
 
 class CustomUserCreationForm(SignupForm):
     first_name = forms.CharField(max_length=30, required=True)
     last_name = forms.CharField(max_length=30, required=True)
     nickname = forms.CharField(max_length=30, required=True)
-    mobile_number = forms.CharField(max_length=20, required=False)
+    mobile_number = forms.CharField(max_length=15, required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,7 +35,7 @@ class CustomUserCreationForm(SignupForm):
             'first_name': 'First Name',
             'last_name': 'Last Name',
             'nickname': 'Nickname ',
-            'mobile_number': 'Mobile Number (optional)',
+            'mobile_number': 'Mobile Number',
             'password1': 'Password'
         }
 
@@ -64,6 +63,23 @@ class CustomUserCreationForm(SignupForm):
         password1 = self.cleaned_data.get('password1')
         validate_password(password1)  # Will raise ValidationError with all messages
         return password1
+
+
+    def clean_mobile_number(self):
+        mobile = self.cleaned_data.get('mobile_number')
+
+        if not mobile:
+            return mobile  # allow empty if optional
+
+        mobile = mobile.strip()
+
+        # E.164 validation
+        if not re.fullmatch(r'^\+[1-9]\d{7,14}$', mobile):
+            raise ValidationError(
+                "Enter a valid international mobile number in format: +[country code][number] (e.g., +919000000000)"
+            )
+
+        return mobile
     
     def save(self, request):
         user = super(SignupForm, self).save(request)

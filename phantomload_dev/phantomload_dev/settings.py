@@ -175,8 +175,6 @@ LOGIN_REDIRECT_URL = '/home/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 
 load_dotenv()
-print("EMAIL:", os.getenv("EMAIL_HOST_USER"))
-print("PASS:", os.getenv("EMAIL_HOST_PASSWORD"))
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"

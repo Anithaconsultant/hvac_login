@@ -1009,23 +1009,23 @@ def get_loadshredder_data(request):
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
 
-    records = LoadShredderRecord.objects.filter(user=user).order_by('actual_attempt_number')
+    records = LoadShredderRecord.objects.filter(user=user).exclude(
+        status="not_started"
+    ).order_by('actual_attempt_number')
 
     data = []
     for record in records:
         data.append({
+            "actual_attempt_number":int(record.actual_attempt_number),
             "attempt_number": record.attempt_number,
             "place": record.place,
-            "starting_case": record.starting_case,
-            "current_sf_tr": record.current_sf_tr,
+            "starting_case": int(record.starting_case) if record.starting_case not in [None, ''] else 0,
+            "current_sf_tr": int(record.current_sf_tr) if record.current_sf_tr not in [None, ''] else 0,
             "status": record.status,
-            "score": record.score
+            "score": record.score,
         })
 
     return Response({
-        "user_id": user.id,
-        "email": user.email,
-        "total_attempts": records.count(),
         "data": data
     })
     
@@ -1100,7 +1100,7 @@ def save_loadshredder_full(request):
             attempt_row.points_scored = data.get('score')
             attempt_row.completion_status = data.get('status')
             attempt_row.time_taken = data.get('time_taken', '10s')
-            attempt_row.max_points = data.get('max_points', 700)
+            attempt_row.max_points = data.get('max_points', 100)
             attempt_row.hint_penalty_points = 0
             attempt_row.bonus_points = 0
             attempt_row.tools_earned = []

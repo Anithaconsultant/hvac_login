@@ -27,7 +27,6 @@
                 <table class="data-table">
                     <thead class="leaderboard-header">
                         <tr>
-                            <th class="col-rank">Level</th>
 
                             <th class="col-task">Task</th>
                             <th class="col-attempt">Attempt</th>
@@ -44,7 +43,6 @@
                         {% for progress in progress_data %}
                         {% if progress.points_scored is not None %}
                         <tr class="data-row">
-                            <td class="cell-rank">{{ progress.level }}</td>
 
                             <td class="cell-task">{{ progress.task_number }}</td>
                             <td class="cell-attempt">{{ progress.attempt_number }}</td>

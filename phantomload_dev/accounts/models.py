@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
 from django.conf import settings
+import random
+import string
 
 
 
@@ -47,6 +49,10 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, first_name, last_name, password, **extra_fields)
+    
+def generate_group_id():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+
 
 class CustomUser(AbstractUser):
     username = None  # Remove the username field
@@ -62,7 +68,46 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     game_version = models.CharField(max_length=20, blank=True, null=True)
     nickname = models.CharField(max_length=30, blank=True, null=True)
-    mobile_number = models.CharField(max_length=20, blank=True, null=True)
+    mobile_number = models.CharField( max_length=15, unique=True,null=True,blank=True)
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other'),
+    ]
+
+    gender = models.CharField(
+        max_length=10,
+        choices=GENDER_CHOICES,
+        null=True,
+        blank=True
+    )
+
+    country = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True
+    )
+
+    pincode = models.IntegerField(
+        null=True,
+        blank=True
+    )
+
+    group_name = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True
+    )
+
+    group_id = models.CharField(
+        max_length=10,
+        unique=True,
+        default=generate_group_id,
+        editable=False,
+        null=True,
+        blank=True
+    )
+
     date_registered = models.DateTimeField(default=timezone.now)
     user_data = models.JSONField(default=list)
     
@@ -77,7 +122,6 @@ class CustomUser(AbstractUser):
 
     
 User = get_user_model()
-
 
 
 class LoadShredderRecord(models.Model):
@@ -107,12 +151,12 @@ class UserGameProgress(models.Model):
     level = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
     attempt_number = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)])
     completion_status = models.CharField(max_length=20, choices=COMPLETION_STATUS_CHOICES)
-    points_scored = models.PositiveIntegerField(null=True, blank=True)
+    points_scored = models.IntegerField(null=True, blank=True)
     time_taken = models.CharField(max_length=20, null=True, blank=True)
     task_number = models.CharField(max_length=20, null=True, blank=True)
     max_points = models.PositiveIntegerField(null=True, blank=True)
-    hint_penalty_points = models.PositiveIntegerField(default=0,null=True, blank=True)
-    bonus_points = models.PositiveIntegerField(default=0,null=True, blank=True)
+    hint_penalty_points = models.IntegerField(default=0,null=True, blank=True)
+    bonus_points = models.IntegerField(default=0,null=True, blank=True)
     tools_earned = models.JSONField(default=list)
     badges = models.JSONField(default=list)
     super_powers = models.JSONField(default=list)
@@ -127,27 +171,4 @@ class UserGameProgress(models.Model):
     def __str__(self):
         return f"{self.user.email} - Level {self.level} Attempt {self.attempt_number}"
     
-    # def save(self, *args, **kwargs):
-    #     # Ensure JSON fields are properly formatted
-    #     if isinstance(self.tools_earned, str):
-    #         try:
-    #             self.tools_earned = json.loads(self.tools_earned)
-    #         except json.JSONDecodeError:
-    #             self.tools_earned = []
-        
-    #     if isinstance(self.badges, str):
-    #         try:
-    #             self.badges = json.loads(self.badges)
-    #         except json.JSONDecodeError:
-    #             self.badges = []
-                
-    #     if isinstance(self.super_powers, str):
-    #         try:
-    #             self.super_powers = json.loads(self.super_powers)
-    #         except json.JSONDecodeError:
-    #             self.super_powers = []
-                
-    #     super().save(*args, **kwargs)
     
-    
- 

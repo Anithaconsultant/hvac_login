@@ -578,7 +578,7 @@ body {
 }
 
 .data-row:hover {
-  background-color: #f8f9fa;
+  background-color: #00000094;
 }
 
 .data-table td {
@@ -627,7 +627,7 @@ body {
 
 .progress-table .cell-time {
   font-family: 'Courier New', monospace;
-  color: #495057;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .progress-table .cell-points {

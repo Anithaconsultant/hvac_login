@@ -22,7 +22,7 @@ def create_user_game_progress(sender, instance, created, **kwargs):
     if created:
         # Create records for only 2 levels (1-2), 3 attempts each, and 10 tasks per attempt
         for level in range(1, 3):  # Only levels 1 and 2
-            for attempt in range(1, 4):  # 3 attempts (1-3)
+            for attempt in range(1, 5):  # 3 attempts (1-3)
                 for task in range(1, 11):  # 10 tasks (1-10)
                     UserGameProgress.objects.create(
                         user=instance,

@@ -1,3 +1,4 @@
+from django.db.models.functions import Cast
 from django.core.mail import send_mail
 import smtplib
 from django.shortcuts import redirect, render
@@ -13,6 +14,7 @@ from rest_framework.views import APIView
 from .forms import FeedbackForm, CustomUserCreationForm
 from .models import UserGameProgress, CustomUser, ActiveSession
 from django.contrib.auth.decorators import login_required
+from django.db.models import Case, When, Value, IntegerField
 import os
 import json
 from django.contrib import messages
@@ -309,9 +311,7 @@ User = get_user_model()
 def reset_game_progress(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
-
-            user_id = data.get('user_id')
+            user_id = request.GET.get('user_id')
             if not user_id:
                 return JsonResponse({
                     'status': 'error',
@@ -379,13 +379,19 @@ def reset_game_progress(request):
         'status': 'error',
         'message': 'Only POST allowed'
     }, status=405)
-    
+
 @login_required
 def view_progress(request):
     progress_data = UserGameProgress.objects.filter(
         user=request.user
-    ).order_by('level', 'attempt_number', 'task_number')
-
+    ).annotate(
+        priority=Case(
+            When(task_number__iexact='Load_Shredder', then=Value(0)),
+            default=Value(1),
+            output_field=IntegerField()
+        ),
+        task_int=Cast('task_number', IntegerField())
+    ).order_by('priority', 'task_int', 'attempt_number')
     for progress in progress_data:
         # Split and clean tools_earned
         tools = (
@@ -393,7 +399,7 @@ def view_progress(request):
             else progress.tools_earned or []
         )
         progress.tools_earned_list = [tool.strip()
-                                      for tool in tools if tool.strip()]
+                                    for tool in tools if tool.strip()]
 
         # Split and clean badges
         badges = (
@@ -409,8 +415,8 @@ def view_progress(request):
             else progress.super_powers or []
         )
         progress.super_powers_list = [power.strip()
-                                      for power in powers if power.strip()]
-        
+                                    for power in powers if power.strip()]
+    
     return render(request, 'progress_data.html', {'progress_data': progress_data})
 
 

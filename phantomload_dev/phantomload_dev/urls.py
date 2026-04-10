@@ -74,13 +74,11 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('credits/', views.credits, name='credits'),
     path('profile/', views.profile, name='profile'),
-     
-    # path('test_email/', views.test_email, name='test_email'),
     path('user_data/<str:user_id>/', UserDataView.as_view(), name='user-data'),
-    path('api/get-username/', get_username, name='get_username'),
-    path('api/loadshredderdata/', get_loadshredder_data, name='get_loadshredder_data'),
+    path('api/get_username/', get_username, name='get_username'),
+    path('api/get_loadshredderdata/', get_loadshredder_data, name='get_loadshredder_data'),
     path('api/get_userprogressdata/', get_userprogress, name='get_userprogress'),
-    path('api/save-loadshredderscore/', save_loadshredder_full, name='save_loadshredder_full'),
+    path('api/post_loadshredderscore/', save_loadshredder_full, name='save_loadshredder_full'),
     path('api/reset_game_progress/', reset_game_progress, name='reset_game_progress')
 
 ]
