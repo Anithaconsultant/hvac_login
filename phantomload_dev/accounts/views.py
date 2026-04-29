@@ -1,6 +1,5 @@
 from django.db.models.functions import Cast
 from django.core.mail import send_mail
-import smtplib
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from allauth.account.views import SignupView
@@ -12,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from .forms import FeedbackForm, CustomUserCreationForm
-from .models import UserGameProgress, CustomUser, ActiveSession
+from .models import UserGameProgress, CustomUser, ActiveSession,UserGameProgress, LoadShredderRecord,Leaderboard
 from django.contrib.auth.decorators import login_required
 from django.db.models import Case, When, Value, IntegerField
 import os
@@ -24,7 +23,6 @@ from django.contrib.auth import login, get_backends
 from .forms import CustomUserCreationForm
 from allauth.account.views import SignupView, ConfirmEmailView, PasswordChangeView, LoginView, LogoutView
 from allauth.account.models import EmailAddress
-from django.contrib.sessions.models import Session
 from django.conf import settings
 from django.dispatch import receiver
 from django.utils import timezone
@@ -33,7 +31,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # limit to 10 total logged-in users
 from django.contrib.auth import get_user_model
-from allauth.account.views import LoginView
 User = get_user_model()
 
 class LimitedLoginView(LoginView):
@@ -298,13 +295,7 @@ def update_game_progress(request):
     )
 
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from django.contrib.auth import get_user_model
-from .models import UserGameProgress, LoadShredderRecord
 
-User = get_user_model()
 
 
 @csrf_exempt
@@ -419,27 +410,37 @@ def view_progress(request):
     
     return render(request, 'progress_data.html', {'progress_data': progress_data})
 
-
 @login_required
 def leaderboard(request):
-    # Annotate users with total points, max level, and shortest time taken for tie-breaking
-    leaderboard_data = CustomUser.objects.annotate(
-        total_points=Sum('usergameprogress__points_scored'),
-        max_level=Max('usergameprogress__level'),
-        time_taken=Min('usergameprogress__time_taken')  # shortest time
-    ).filter(
-        # Exclude zero and empty time
-        ~Q(total_points=0) & ~Q(time_taken__isnull=True)
-    ).order_by('-total_points', 'time_taken')[:10]   # Limit Top 10
 
-    # Get tools, badges, and superpowers for each user
-    for user in leaderboard_data:
-        progress_data = UserGameProgress.objects.filter(user=user)
+    # ✅ Step 1: Get top 10 from Leaderboard table (FAST)
+    leaderboard_qs = Leaderboard.objects.select_related('user')\
+        .filter(total_points__gt=0, best_time__isnull=False)[:10]
+
+    user_ids = [l.user_id for l in leaderboard_qs]
+
+    # ✅ Step 2: Fetch all progress in ONE query
+    all_progress = UserGameProgress.objects.filter(user__in=user_ids)
+
+    progress_map = {}
+    for p in all_progress:
+        progress_map.setdefault(p.user_id, []).append(p)
+
+    # ✅ Step 3: Attach tools, badges, powers (your logic)
+    leaderboard_data = []
+
+    for entry in leaderboard_qs:
+        user = entry.user
+
+        user.total_points = entry.total_points
+        user.max_level = entry.max_level
+        user.time_taken = int(entry.best_time)
+
+        progress_data = progress_map.get(user.id, [])
 
         all_tools, all_badges, all_powers = set(), set(), set()
 
         for progress in progress_data:
-
             tools = progress.tools_earned.split(',') if isinstance(
                 progress.tools_earned, str) else progress.tools_earned or []
             badges = progress.badges.split(',') if isinstance(
@@ -447,22 +448,24 @@ def leaderboard(request):
             powers = progress.super_powers.split(',') if isinstance(
                 progress.super_powers, str) else progress.super_powers or []
 
-            all_tools.update(tool.strip() for tool in tools)
-            all_badges.update(badge.strip() for badge in badges)
-            all_powers.update(power.strip() for power in powers)
+            all_tools.update(t.strip() for t in tools if t.strip())
+            all_badges.update(b.strip() for b in badges if b.strip())
+            all_powers.update(p.strip() for p in powers if p.strip())
 
         user.tools_earned = ', '.join(sorted(all_tools)) if all_tools else "-"
-        user.tools_earned_list = sorted(all_tools) if all_tools else []
+        user.tools_earned_list = sorted(all_tools)
 
         user.badges = ', '.join(sorted(all_badges)) if all_badges else "-"
-        user.badges_list = sorted(all_badges) if all_badges else []
+        user.badges_list = sorted(all_badges)
 
-        user.super_powers = ', '.join(
-            sorted(all_powers)) if all_powers else "-"
-        user.super_powers_list = sorted(all_powers) if all_powers else []
+        user.super_powers = ', '.join(sorted(all_powers)) if all_powers else "-"
+        user.super_powers_list = sorted(all_powers)
 
-    return render(request, 'leaderboard.html', {'leaderboard_data': leaderboard_data})
+        leaderboard_data.append(user)
 
+    return render(request, 'leaderboard.html', {
+        'leaderboard_data': leaderboard_data
+    })
 
 def about(request):
     return render(request, 'about.html')

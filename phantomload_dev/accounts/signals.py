@@ -1,12 +1,11 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
-from .models import UserGameProgress
+from .models import UserGameProgress,ActiveSession,Leaderboard
 #from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_out
-from .models import ActiveSession
 
 @receiver(user_logged_out)
 def clear_active_session(sender, request, user, **kwargs):
@@ -16,27 +15,48 @@ def clear_active_session(sender, request, user, **kwargs):
     
     
 User = get_user_model()
-
 @receiver(post_save, sender=User)
-def create_user_game_progress(sender, instance, created, **kwargs):
+def create_user_related_data(sender, instance, created, **kwargs):
     if created:
-        # Create records for only 2 levels (1-2), 3 attempts each, and 10 tasks per attempt
-        for level in range(1, 3):  # Only levels 1 and 2
-            for attempt in range(1, 5):  # 3 attempts (1-3)
-                for task in range(1, 11):  # 10 tasks (1-10)
+        # ✅ Create leaderboard row
+        Leaderboard.objects.create(user=instance)
+
+        # ✅ Your existing progress creation (UNCHANGED)
+        for level in range(1, 3):
+            for attempt in range(1, 4):  # ✅ FIXED (was 1–5 earlier)
+                for task in range(1, 11):
                     UserGameProgress.objects.create(
                         user=instance,
                         level=level,
                         attempt_number=attempt,
-                        task_number=str(task),  # Stored as string (CharField)
+                        task_number=str(task),
                         completion_status='not_started',
-                        # Other fields will use their defaults (null/blank/default values)
                     )
+
         for attempt in range(1, 4):
             UserGameProgress.objects.create(
                 user=instance,
                 level=1,
                 attempt_number=attempt,
-                task_number="Load_Shredder",  # 👈 your custom task
+                task_number="Load_Shredder",
                 completion_status='not_started',
             )
+            
+from django.db.models import Sum, Max, Min
+
+@receiver(post_save, sender=UserGameProgress)
+def update_leaderboard(sender, instance, **kwargs):
+    leaderboard, _ = Leaderboard.objects.get_or_create(user=instance.user)
+
+    # ✅ SAFE recalculation (no double counting)
+    agg = UserGameProgress.objects.filter(user=instance.user).aggregate(
+        total_points=Sum('points_scored'),
+        max_level=Max('level'),
+        best_time=Min('time_taken')
+    )
+
+    leaderboard.total_points = agg['total_points'] or 0
+    leaderboard.max_level = agg['max_level'] or 0
+    leaderboard.best_time = agg['best_time']
+
+    leaderboard.save()

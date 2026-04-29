@@ -68,7 +68,6 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     game_version = models.CharField(max_length=20, blank=True, null=True)
     nickname = models.CharField(max_length=30, blank=True, null=True)
-    mobile_number = models.CharField( max_length=15, unique=True,null=True,blank=True)
     GENDER_CHOICES = [
         ('male', 'Male'),
         ('female', 'Female'),
@@ -83,11 +82,17 @@ class CustomUser(AbstractUser):
     )
 
     country = models.CharField(
-        max_length=100,
+    max_length=2,   # ISO code like IN, US
+    null=True,
+    blank=True
+    )
+
+    mobile_number = models.CharField(
+        max_length=20,  # for +919876543210
+        unique=True,
         null=True,
         blank=True
     )
-
     pincode = models.IntegerField(
         null=True,
         blank=True
@@ -171,4 +176,21 @@ class UserGameProgress(models.Model):
     def __str__(self):
         return f"{self.user.email} - Level {self.level} Attempt {self.attempt_number}"
     
-    
+
+class Leaderboard(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    total_points = models.IntegerField(default=0)
+    max_level = models.IntegerField(default=0)
+    best_time = models.FloatField(null=True, blank=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-total_points', 'best_time']
+        indexes = [
+            models.Index(fields=['-total_points', 'best_time']),
+        ]
+
+    def __str__(self):
+        return f"{self.user} - {self.total_points}"
