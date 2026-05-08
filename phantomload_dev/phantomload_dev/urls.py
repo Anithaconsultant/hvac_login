@@ -17,14 +17,15 @@ from accounts.views import (
     CustomSignupView,
     CustomPasswordChangeView,
     LimitedLoginView,
-    reset_game_progress
+    reset_game_progress,
+    custom_logout
 )
 from accounts.api import get_userprogress,save_loadshredder_full,get_loadshredder_data,get_username,Task11LightingScenarioApi,unity_logout,CustomTokenObtainPairView,Task11TicketFixesApi, ReadTask08excel,ReadQandAexcel,RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, Task11LightFixtureApi
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-from accounts.views import CustomSignupView, CustomPasswordChangeView
+from accounts.views import CustomSignupView, CustomPasswordChangeView,LogoutView
 from allauth.account.views import LoginView
 from accounts import views
 from django.conf import settings
@@ -79,7 +80,8 @@ urlpatterns = [
     path('api/get_loadshredderdata/', get_loadshredder_data, name='get_loadshredder_data'),
     path('api/get_userprogressdata/', get_userprogress, name='get_userprogress'),
     path('api/post_loadshredderscore/', save_loadshredder_full, name='save_loadshredder_full'),
-    path('api/reset_game_progress/', reset_game_progress, name='reset_game_progress')
+    path('api/reset_game_progress/', reset_game_progress, name='reset_game_progress'),
+    path('api/logout/', views.custom_logout, name='custom_logout'),
 
 ]
 

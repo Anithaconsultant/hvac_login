@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import CustomUser,Group
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 
@@ -38,4 +38,20 @@ class ActiveSessionAdmin(admin.ModelAdmin):
     search_fields = ("user__username", "user__email")
 
 
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'group_id',
+        'group_name',
+        'organisation',
+        'user_count'
+    )
+
+    readonly_fields = ('group_id', 'user_count')
+
 admin.site.register(CustomUser, CustomUserAdmin)
+
+
+

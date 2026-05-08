@@ -18,7 +18,7 @@ class ActiveSession(models.Model):
     )
     session_key = models.CharField(max_length=40, unique=True)
     login_time = models.DateTimeField(auto_now_add=True)
-
+    last_seen = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.email} active"
@@ -55,19 +55,33 @@ def generate_group_id():
 
 
 class CustomUser(AbstractUser):
-    username = None  # Remove the username field
+    username = None
+
     id = models.CharField(
         primary_key=True,
         max_length=8,
         unique=True,
         editable=False,
-        default=generate_short_id  # 👈 use it here
+        default=generate_short_id
     )
+
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
+
     email = models.EmailField(unique=True)
-    game_version = models.CharField(max_length=20, blank=True, null=True)
-    nickname = models.CharField(max_length=30, blank=True, null=True)
+
+    game_version = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
+    )
+
+    nickname = models.CharField(
+        max_length=30,
+        blank=True,
+        null=True
+    )
+
     GENDER_CHOICES = [
         ('male', 'Male'),
         ('female', 'Female'),
@@ -82,49 +96,46 @@ class CustomUser(AbstractUser):
     )
 
     country = models.CharField(
-    max_length=2,   # ISO code like IN, US
-    null=True,
-    blank=True
+        max_length=2,
+        null=True,
+        blank=True
     )
 
     mobile_number = models.CharField(
-        max_length=20,  # for +919876543210
+        max_length=20,
         unique=True,
         null=True,
         blank=True
     )
+
     pincode = models.IntegerField(
         null=True,
         blank=True
     )
 
-    group_name = models.CharField(
-        max_length=20,
+    # ✅ New Group Relation
+    group = models.ForeignKey(
+        'Group',
+        on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name='users'
     )
 
-    group_id = models.CharField(
-        max_length=10,
-        unique=True,
-        default=generate_group_id,
-        editable=False,
-        null=True,
-        blank=True
+    date_registered = models.DateTimeField(
+        default=timezone.now
     )
 
-    date_registered = models.DateTimeField(default=timezone.now)
     user_data = models.JSONField(default=list)
-    
+
     USERNAME_FIELD = 'email'
+
     REQUIRED_FIELDS = ['first_name', 'last_name']
-    
+
     objects = CustomUserManager()
-    
+
     def __str__(self):
         return self.email
-
-
     
 User = get_user_model()
 
@@ -194,3 +205,30 @@ class Leaderboard(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.total_points}"
+    
+class Group(models.Model):
+    group_id = models.CharField(max_length=10, unique=True, editable=False)
+    group_name = models.CharField(max_length=50)
+    organisation = models.CharField(max_length=100)
+    user_count = models.IntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.group_id:
+
+            unique = False
+
+            while not unique:
+
+                new_id = generate_group_id()
+
+                if not Group.objects.filter(group_id=new_id).exists():
+                    self.group_id = new_id
+                    unique = True
+
+        super().save(*args, **kwargs)
+
+
+    def __str__(self):
+        return f"{self.group_name} ({self.group_id})"

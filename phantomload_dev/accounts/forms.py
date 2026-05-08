@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import CustomUser, UserGameProgress
+from .models import CustomUser, UserGameProgress,Group
 from allauth.account.forms import SignupForm
 from django.utils.safestring import mark_safe
 from django.contrib.auth.password_validation import validate_password
@@ -29,6 +29,7 @@ class CustomUserCreationForm(SignupForm):
     last_name = forms.CharField(max_length=30, required=True)
     nickname = forms.CharField(max_length=30, required=True)
     gender = forms.ChoiceField(choices=GENDER_CHOICES, required=True)
+    group_id = forms.CharField(max_length=10, required=False)
 
     country = forms.ChoiceField(
         choices=COUNTRY_CHOICES,
@@ -55,7 +56,7 @@ class CustomUserCreationForm(SignupForm):
             'last_name': 'Last Name',
             'nickname': 'Nickname ',
             'mobile_number': 'Enter number (no country code)',
-            'password1': 'Password'
+            'password1': 'Set your password'
         }
 
         for field, placeholder in field_placeholders.items():
@@ -84,7 +85,32 @@ class CustomUserCreationForm(SignupForm):
             '</ul>'
             '</small>'
         )
+        self.fields['group_id'].widget.attrs.update({
+            'class': 'auth-form-control',
+            'placeholder': 'Enter Group ID',
+            'autocomplete': 'off',
+            'id': 'group_id_input'   # 👈 important for JS
+        })
+        for field_name, field in self.fields.items():
+            if field.required:
+                existing_class = field.widget.attrs.get('class', '')
 
+                field.widget.attrs['class'] = (
+                    existing_class + ' required-input'
+                )
+        
+    def clean_group_id(self):
+        group_id = self.cleaned_data.get('group_id')
+        if group_id:
+            try:
+                group = Group.objects.get(
+                    group_id=group_id.upper()
+                )
+                self.cleaned_data['group_instance'] = group
+            except Group.DoesNotExist:
+                raise ValidationError("Invalid Group ID")
+        return group_id.upper()
+    
     def clean_password1(self):
         password1 = self.cleaned_data.get('password1')
         validate_password(password1)
@@ -130,8 +156,10 @@ class CustomUserCreationForm(SignupForm):
         user.gender = self.cleaned_data.get('gender')
         user.country = self.cleaned_data.get('country')
 
-        # ✅ FIX: safe fallback
         user.mobile_number = self.cleaned_data.get('full_mobile_number', None)
+
+        # ✅ Assign group
+        user.group = self.cleaned_data.get('group_instance', None)
 
         user.save()
         return user

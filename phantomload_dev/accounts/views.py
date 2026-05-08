@@ -19,7 +19,7 @@ import json
 from django.contrib import messages
 from django.conf import settings
 from django.db.models import Sum, Max, Min, Q
-from django.contrib.auth import login, get_backends
+from django.contrib.auth import login, get_backends,logout,get_user_model
 from .forms import CustomUserCreationForm
 from allauth.account.views import SignupView, ConfirmEmailView, PasswordChangeView, LoginView, LogoutView
 from allauth.account.models import EmailAddress
@@ -29,8 +29,7 @@ from django.utils import timezone
 from .utils import can_user_login
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-# limit to 10 total logged-in users
-from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 class LimitedLoginView(LoginView):
@@ -65,6 +64,18 @@ class LimitedLoginView(LoginView):
         )
 
         return response
+
+def custom_logout(request):
+
+    if request.user.is_authenticated:
+
+        ActiveSession.objects.filter(
+            user=request.user
+        ).delete()
+
+    logout(request)
+
+    return redirect('account_login')
 
 
 class CustomPasswordChangeView(PasswordChangeView):
@@ -144,7 +155,7 @@ def home_redirect(request):
     """Redirect root URL to appropriate location"""
     if request.user.is_authenticated:
         return redirect('home')  # Goes to the actual home view
-    return redirect('account_login')  # Goes to allauth login
+    return redirect('about')  # Goes to allauth login
 
 
 @login_required
@@ -551,3 +562,23 @@ def test_email(request):
         return HttpResponse("SUCCESS: Email sent")
     except Exception as e:
         return HttpResponse(f"FAILED: {repr(e)}")
+# views.py
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Group
+
+@api_view(['GET'])
+def get_group_by_id(request):
+    group_id = request.GET.get('group_id')
+
+    try:
+        group = Group.objects.get(group_id=group_id)
+        return Response({
+            "valid": True,
+            "group_name": group.group_name
+        })
+    except Group.DoesNotExist:
+        return Response({
+            "valid": False,
+            "group_name": None
+        })

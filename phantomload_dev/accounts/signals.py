@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save,post_delete
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from .models import UserGameProgress,ActiveSession,Leaderboard
@@ -60,3 +60,17 @@ def update_leaderboard(sender, instance, **kwargs):
     leaderboard.best_time = agg['best_time']
 
     leaderboard.save()
+    
+@receiver(post_save, sender=User)
+def update_group_user_count(sender, instance, created, **kwargs):
+    if created and instance.group:
+        group = instance.group
+        group.user_count =group.users.count()
+        group.save()
+
+@receiver(post_delete, sender=User)
+def decrease_group_user_count(sender, instance, **kwargs):
+    if instance.group:
+        group = instance.group
+        group.user_count -= 1
+        group.save()

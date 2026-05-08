@@ -133,7 +133,8 @@ class ClientLoginView(APIView):
 
                 # ✅ STEP 1: CHECK GLOBAL LIMIT
                 allowed, error = can_user_login(user)
-
+                print("allowed:", allowed)
+                print("error:", error)
                 if not allowed:
                     return Response({
                         'detail': 'Maximum users reached. Try later.'
@@ -604,8 +605,6 @@ class ReadQandAexcel(APIView):
             data = df.to_dict(orient='records')
 
             return Response({
-                'filename': self.EXCEL_FILENAME,
-                'row_count': len(data),
                 'gender': gender,   # ✅ added here
                 'data': data
             })
@@ -937,3 +936,4 @@ def save_loadshredder_full(request):
         "attempt_used": attempt_number,
         "actual_attempt_number": actual_attempt_number
     })
+    

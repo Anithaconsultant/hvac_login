@@ -271,7 +271,7 @@ CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 # Maximum players allowed
-MAX_CONCURRENT_USERS = 10
+MAX_CONCURRENT_USERS = 2
 
 # VERY IMPORTANT – long session for Unity gameplay
 SESSION_COOKIE_AGE = 12 * 60 * 60   # 12 hours
