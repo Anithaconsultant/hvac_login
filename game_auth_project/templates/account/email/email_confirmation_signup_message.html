@@ -1,0 +1,91 @@
+<!-- {% load i18n %}
+{% autoescape off %}
+<!DOCTYPE html>
+<html>
+  <body style="font-family: Arial, sans-serif; line-height: 1.5;">
+    <p>Thank you for registering on Phantom Load!</p>
+
+    <p>
+      Please confirm your email by clicking the link below:
+      <br>
+      <a href="{{ activate_url }}" target="_blank"><div class="activation_button" style="background-color: rgb(41, 177, 240);color:#fff">Verify Email</div></a>
+    </p>
+
+    <!div class="hero-description" style="margin-top: 20px;">
+      Click on the link to see the demo version of the game:
+      <br>
+      <a target="_blank" href="https://phantom-load.in/webgl/">Demo Version</a>
+    </div>
+
+    <p>If you did not register, please ignore this email.</p>
+
+    <p>
+      For any questions or support, please contact us at:
+      <a href="mailto:support@phantom-load.in">support@phantom-load.in</a>
+    </p>
+
+    <p>Best Regards,<br>The Phantom Load Team</p>
+  </body>
+</html>
+{% endautoescape %} -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Email Verification</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 20px;">
+
+    <table width="100%" cellspacing="0" cellpadding="0"
+        style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; padding: 30px;">
+        <tr>
+            <td style="text-align: center;">
+                <img src="https://dev.phantom-load.in/static/images/logo_pl.png" alt="Phantom Load Logo" width="120"
+                    style="display: block; margin: 0 auto 10px auto;" />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <p>Hi,</p>
+                <p>Thank you for registering on <b>Phantom Load</b>!</p>
+                <p>Please confirm your email by clicking the button below:</p>
+            </td>
+        </tr>
+
+        <!-- BUTTON -->
+        <tr>
+            <td style="text-align: center; padding: 30px 0;">
+                <a href="{{ activate_url }}" style="background-color: #555; 
+                          color: white;border: 2px solid #9d9d9c; 
+                          padding: 14px 30px;text-decoration: none;
+                          border-radius: 0; 
+                          font-size: 16px; 
+                          display: inline-block;">
+                    Verify Email
+                </a>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="text-align: center;">
+                <p>Having trouble verifying your email?</p>
+                <p><a href="{{ activate_url }}">Try in your browser</a></p>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <p>If you did not register, please ignore this email.</p>
+                <p>For any questions or support, contact: <a
+                        href="mailto:support@phantom-load.in">support@phantom-load.in</a></p>
+                <p>Best Regards,<br>The Phantom Load Team</p>
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

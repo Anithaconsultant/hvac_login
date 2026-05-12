@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
-from .forms import CustomUserCreationForm, CustomUserChangeForm, LoginForm
+from .models import CustomUser,Group
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 
 class CustomUserAdmin(UserAdmin):
@@ -29,4 +29,29 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email',)
 
 
+    
+from .models import ActiveSession
+
+@admin.register(ActiveSession)
+class ActiveSessionAdmin(admin.ModelAdmin):
+    list_display = ("user", "session_key", "login_time")
+    search_fields = ("user__username", "user__email")
+
+
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'group_id',
+        'group_name',
+        'organisation',
+        'user_count'
+    )
+
+    readonly_fields = ('group_id', 'user_count')
+
 admin.site.register(CustomUser, CustomUserAdmin)
+
+
+

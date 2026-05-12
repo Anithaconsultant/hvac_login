@@ -1,64 +1,153 @@
+from django.db.models.functions import Cast
 from django.core.mail import send_mail
-import smtplib
-import logging
 from django.shortcuts import redirect, render
-from django.views import View
 from django.contrib.auth.decorators import login_required
-from allauth.account.views import EmailVerificationSentView, LoginView, SignupView
+from allauth.account.views import SignupView
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
-from django.http import JsonResponse, Http404, FileResponse
+from django.http import JsonResponse, Http404, FileResponse, HttpResponse
 from django.utils import timezone
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
-from .serializers import GameProgressSerializer
-from .forms import UserGameProgressForm, FeedbackForm
-from .models import UserGameProgress, CustomUser
+from .forms import FeedbackForm, CustomUserCreationForm
+from .models import UserGameProgress, CustomUser, ActiveSession,UserGameProgress, LoadShredderRecord,Leaderboard
 from django.contrib.auth.decorators import login_required
-import django
-from django.shortcuts import get_object_or_404
-from rest_framework import status
-from rest_framework.parsers import JSONParser
+from django.db.models import Case, When, Value, IntegerField
 import os
 import json
 from django.contrib import messages
 from django.conf import settings
-from rest_framework.decorators import api_view, permission_classes
-from django.db.models import Sum, Min
-from django.contrib.auth import login as auth_login
+from django.db.models import Sum, Max, Min, Q
+from django.contrib.auth import login, get_backends,logout,get_user_model
 from .forms import CustomUserCreationForm
-from django.urls import reverse
-from allauth.account.utils import send_email_confirmation
-from allauth.account.views import ConfirmEmailView
+from allauth.account.views import SignupView, ConfirmEmailView, PasswordChangeView, LoginView, LogoutView
+from allauth.account.models import EmailAddress
+from django.conf import settings
+from django.dispatch import receiver
+from django.utils import timezone
+from .utils import can_user_login
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+User = get_user_model()
+
+class LimitedLoginView(LoginView):
+
+    def form_valid(self, form):
+        user = form.user
+
+        # ✅ STEP 4.1: Check limit
+        allowed, error = can_user_login(user)
+
+        if not allowed:
+            messages.error(
+                self.request,
+                "Maximum users reached. Try later.",
+                extra_tags="limit_error"
+            )
+            return redirect("account_login")
+
+        # ✅ STEP 4.2: Login normally
+        response = super().form_valid(form)
+
+        # ✅ STEP 4.3: Ensure session exists
+        if not self.request.session.session_key:
+            self.request.session.create()
+
+        # ✅ STEP 4.4: Store session (IMPORTANT)
+        ActiveSession.objects.update_or_create(
+            user=user,
+            defaults={
+                "session_key": self.request.session.session_key
+            }
+        )
+
+        return response
+
+def custom_logout(request):
+
+    if request.user.is_authenticated:
+
+        ActiveSession.objects.filter(
+            user=request.user
+        ).delete()
+
+    logout(request)
+
+    return redirect('account_login')
+
+
+class CustomPasswordChangeView(PasswordChangeView):
+    def form_valid(self, form):
+        # Clear previous messages so login/logout messages are removed
+        storage = messages.get_messages(self.request)
+        storage.used = True
+
+        messages.success(
+            self.request, "Your password has been successfully updated.")
+        return super().form_valid(form)
 
 
 class CustomConfirmEmailView(ConfirmEmailView):
-    def post(self, *args, **kwargs):
-        response = super().post(*args, **kwargs)
-        if self.request.user.is_authenticated:
-            login(self.request, self.request.user)
-        return redirect('home')
 
-    def get(self, *args, **kwargs):
-        response = super().get(*args, **kwargs)
-        if self.request.user.is_authenticated:
-            login(self.request, self.request.user)
-            return redirect('home')
-        return response
+    def login_user(self, request, user):
+        """Logs in user safely when multiple backends exist."""
+        if not getattr(user, "backend", None):
+            backend = get_backends()[0]
+            user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
+        login(request, user)
+
+    def get(self, request, *args, **kwargs):
+        """Handles GET requests including 'try again in browser'."""
+        try:
+            confirmation = self.get_object()
+        except Exception:
+            # Already verified → safe redirect
+            if request.user.is_authenticated:
+                return redirect("home")
+            # or a custom "already verified page"
+            return redirect("account_login")
+
+        # If email already verified
+        if confirmation.email_address.verified:
+            if request.user.is_authenticated:
+                return redirect("home")
+            else:
+                # log user in & redirect
+                self.login_user(request, confirmation.email_address.user)
+                return redirect("home")
+
+        # Not yet verified → normal flow
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """Handles POST confirmation."""
+        response = super().post(request, *args, **kwargs)
+
+        if request.user.is_authenticated:
+            self.login_user(request, request.user)
+
+        return redirect("home")
 
 
 class CustomSignupView(SignupView):
-    form_class = CustomUserCreationForm
+    form_class = CustomUserCreationForm  # your custom signup form
 
     def form_valid(self, form):
-        # Let allauth create the user
+        # Create the user but don't log them in
         response = super().form_valid(form)
+        user = self.user
 
-        # Send confirmation immediately
-        send_email_confirmation(self.request, self.user, signup=True)
+        # Send verification email using new API
+        EmailAddress.objects.add_email(
+            self.request,
+            user,
+            user.email,
+            confirm=True  # triggers the confirmation email
+        )
 
+        # Redirect to verification-sent page
         return redirect('account_email_verification_sent')
 
 
@@ -66,7 +155,7 @@ def home_redirect(request):
     """Redirect root URL to appropriate location"""
     if request.user.is_authenticated:
         return redirect('home')  # Goes to the actual home view
-    return redirect('account_login')  # Goes to allauth login
+    return redirect('about')  # Goes to allauth login
 
 
 @login_required
@@ -217,175 +306,290 @@ def update_game_progress(request):
     )
 
 
+
+
+
+@csrf_exempt
+def reset_game_progress(request):
+    if request.method == 'POST':
+        try:
+            user_id = request.GET.get('user_id')
+            if not user_id:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'user_id is required'
+                }, status=400)
+
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'User not found'
+                }, status=404)
+
+            # =========================
+            # ✅ RESET UserGameProgress
+            # =========================
+            progress_updated = UserGameProgress.objects.filter(user=user).update(
+                completion_status='not_started',
+                points_scored=None,
+                time_taken=None,
+                max_points=None,
+                hint_penalty_points=0,
+                bonus_points=0,
+                tools_earned=[],
+                badges=[],
+                super_powers=[]
+            )
+
+            # =========================
+            # ✅ RESET LoadShredderRecord
+            # =========================
+            shredder_records = LoadShredderRecord.objects.filter(user=user).order_by('attempt_number')
+
+            actual_counter = 1
+
+            for record in shredder_records:
+                record.score = 0
+                record.status = 'not_started'
+                record.place = ""
+                record.starting_case = ""
+                record.current_sf_tr = 0
+
+                # 🔁 reset attempt rotation properly
+                record.actual_attempt_number = actual_counter
+                record.attempt_number = ((actual_counter - 1) % 3) + 1
+
+                record.save()
+                actual_counter += 1
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Game + Load Shredder reset successfully',
+                'progress_updated': progress_updated,
+                'shredder_records_reset': shredder_records.count()
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Only POST allowed'
+    }, status=405)
+
 @login_required
 def view_progress(request):
     progress_data = UserGameProgress.objects.filter(
         user=request.user
-    ).order_by('level', 'attempt_number', 'task_number')
-
+    ).annotate(
+        priority=Case(
+            When(task_number__iexact='Load_Shredder', then=Value(0)),
+            default=Value(1),
+            output_field=IntegerField()
+        ),
+        task_int=Cast('task_number', IntegerField())
+    ).order_by('priority', 'task_int', 'attempt_number')
     for progress in progress_data:
         # Split and clean tools_earned
         tools = (
             progress.tools_earned.split(',') if isinstance(progress.tools_earned, str)
             else progress.tools_earned or []
         )
-        progress.tools_earned_list = [tool.strip() for tool in tools if tool.strip()]
+        progress.tools_earned_list = [tool.strip()
+                                    for tool in tools if tool.strip()]
 
         # Split and clean badges
         badges = (
             progress.badges.split(',') if isinstance(progress.badges, str)
             else progress.badges or []
         )
-        progress.badges_list = [badge.strip() for badge in badges if badge.strip()]
+        progress.badges_list = [badge.strip()
+                                for badge in badges if badge.strip()]
 
         # Split and clean super_powers
         powers = (
             progress.super_powers.split(',') if isinstance(progress.super_powers, str)
             else progress.super_powers or []
         )
-        progress.super_powers_list = [power.strip() for power in powers if power.strip()]
-
+        progress.super_powers_list = [power.strip()
+                                    for power in powers if power.strip()]
+    
     return render(request, 'progress_data.html', {'progress_data': progress_data})
-
 
 @login_required
 def leaderboard(request):
-    # Calculate net points for each user (sum of all points_scored)
-    leaderboard_data = CustomUser.objects.annotate(
-        total_points=Sum('usergameprogress__points_scored'),
-        time_taken=Min('usergameprogress__time_taken')
-    ).order_by('-total_points', 'time_taken')
 
-    # Get tools, badges, and super_powers for each user
-    for user in leaderboard_data:
-        progress_data = UserGameProgress.objects.filter(user=user)
+    # ✅ Step 1: Get top 10 from Leaderboard table (FAST)
+    leaderboard_qs = Leaderboard.objects.select_related('user')\
+        .filter(total_points__gt=0, best_time__isnull=False)[:10]
 
-        # Initialize sets to avoid duplicates
-        all_tools = set()
-        all_badges = set()
-        all_powers = set()
+    user_ids = [l.user_id for l in leaderboard_qs]
+
+    # ✅ Step 2: Fetch all progress in ONE query
+    all_progress = UserGameProgress.objects.filter(user__in=user_ids)
+
+    progress_map = {}
+    for p in all_progress:
+        progress_map.setdefault(p.user_id, []).append(p)
+
+    # ✅ Step 3: Attach tools, badges, powers (your logic)
+    leaderboard_data = []
+
+    for entry in leaderboard_qs:
+        user = entry.user
+
+        user.total_points = entry.total_points
+        user.max_level = entry.max_level
+        user.time_taken = int(entry.best_time)
+
+        progress_data = progress_map.get(user.id, [])
+
+        all_tools, all_badges, all_powers = set(), set(), set()
 
         for progress in progress_data:
-            # Process tools_earned (split if string, else treat as list)
-            tools = (
-                progress.tools_earned.split(',')
-                if isinstance(progress.tools_earned, str)
-                else progress.tools_earned or []  # Handle None/empty
-            )
-            all_tools.update(tool.strip() for tool in tools)
+            tools = progress.tools_earned.split(',') if isinstance(
+                progress.tools_earned, str) else progress.tools_earned or []
+            badges = progress.badges.split(',') if isinstance(
+                progress.badges, str) else progress.badges or []
+            powers = progress.super_powers.split(',') if isinstance(
+                progress.super_powers, str) else progress.super_powers or []
 
-            # Process badges (split if string, else treat as list)
-            badges = (
-                progress.badges.split(',')
-                if isinstance(progress.badges, str)
-                else progress.badges or []
-            )
-            all_badges.update(badge.strip() for badge in badges)
+            all_tools.update(t.strip() for t in tools if t.strip())
+            all_badges.update(b.strip() for b in badges if b.strip())
+            all_powers.update(p.strip() for p in powers if p.strip())
 
-            # Process super_powers (split if string, else treat as list)
-            powers = (
-                progress.super_powers.split(',')
-                if isinstance(progress.super_powers, str)
-                else progress.super_powers or []
-            )
-            all_powers.update(power.strip() for power in powers)
-
-        # Assign formatted strings (or "-" if empty)
         user.tools_earned = ', '.join(sorted(all_tools)) if all_tools else "-"
-        user.tools_earned_list = sorted(all_tools) if all_tools else []
+        user.tools_earned_list = sorted(all_tools)
+
         user.badges = ', '.join(sorted(all_badges)) if all_badges else "-"
-        user.badges_list = sorted(all_badges) if all_badges else []
-        user.super_powers = ', '.join(
-            sorted(all_powers)) if all_powers else "-"
-        user.super_powers_list = sorted(all_powers) if all_powers else []
+        user.badges_list = sorted(all_badges)
 
-    return render(request, 'leaderboard.html', {'leaderboard_data': leaderboard_data})
+        user.super_powers = ', '.join(sorted(all_powers)) if all_powers else "-"
+        user.super_powers_list = sorted(all_powers)
 
+        leaderboard_data.append(user)
+
+    return render(request, 'leaderboard.html', {
+        'leaderboard_data': leaderboard_data
+    })
 
 def about(request):
     return render(request, 'about.html')
 
 
-# views.py
-
-logger = logging.getLogger(__name__)
-
-
+@login_required
 def feedback_view(request):
-    if request.method == 'POST':
+    feedback_sent = False
+    print(request.user.email)
+
+    if request.method == "POST":
         form = FeedbackForm(request.POST)
+        print("Form data:", request.POST)
+
         if form.is_valid():
-            feedback = form.cleaned_data['feedback']
-            user_email = form.cleaned_data['email']
+            feedback_text = form.cleaned_data["feedback"]
+            user_email = request.user.email if request.user.is_authenticated else "Anonymous"
 
-            print(f"=== FEEDBACK SUBMISSION ===")
-            print(f"Feedback: {feedback}")
-            print(f"User email: {user_email}")
+            subject = f" New Feedback - Phantom Load"
 
-            # Create email content
-            subject = "New Feedback - Phantom Load Application"
             message = f"""
-New feedback has been submitted through the Phantom Load application:
+-----------------------------------------------------------
+USER FEEDBACK
+-----------------------------------------------------------
 
-FEEDBACK:
-{feedback}
+Feedback Message:
+{feedback_text}
 
-SUBMITTED BY:
-- User: {request.user.email if request.user.is_authenticated else 'Anonymous'}
-- Email: {user_email}
-- Timestamp: {timezone.now()}
-
-Please review this feedback and take appropriate action.
+----------------------------------------------------------
+Submitted By:
+Email: {user_email}
+Time: {timezone.now().strftime('%d %B %Y, %I:%M %p')}
 """
 
             try:
-           
-                result = send_mail(
-                    subject=subject,
-                    message=message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=['support@phantom-load.in'],
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    ["support@phantom-load.in"],
                     fail_silently=False,
                 )
 
-                print(f"=== EMAIL SEND RESULT: {result} ===")
+                feedback_sent = True
+                form = FeedbackForm()  # Clear textarea after success
 
-                if result == 1:
-                    messages.success(
-                        request, 'Thank you for your feedback! Your message has been sent successfully.')
-                    print("✅ Feedback email sent successfully")
-                else:
-                    messages.error(
-                        request, 'Failed to send feedback. Please try again.')
-                    print("❌ Feedback email failed")
-
-                return redirect('feedback')
-
-            except smtplib.SMTPAuthenticationError as e:
-                error_msg = "Email authentication failed. Please check the email configuration."
-                print(f"❌ SMTP Authentication Error: {e}")
-                messages.error(request, error_msg)
-            except smtplib.SMTPException as e:
-                error_msg = "Email service error. Please try again later."
-                print(f"❌ SMTP Error: {e}")
-                messages.error(request, error_msg)
             except Exception as e:
-                error_msg = f"Error sending feedback: {str(e)}"
-                print(f"❌ General Error: {e}")
-                messages.error(request, error_msg)
+                print("Email Error:", e)
+                messages.error(
+                    request, "⚠ Something went wrong. Could not send the feedback email.")
+
         else:
-            print("Form validation failed")
-            messages.error(request, 'Please correct the errors below.')
+            print("Form validation failed:", form.errors)
+            messages.error(request, "Please correct the errors.")
 
     else:
         form = FeedbackForm()
 
-    return render(request, 'feedback.html', {'form': form})
+    return render(request, "feedback.html", {
+        "form": form,
+        "feedback_sent": feedback_sent,
+    })
 
 
 def credits(request):
     return render(request, 'credits.html')
 
 
+@login_required
 def profile(request):
-    return render(request, 'profile.html')
+    user = request.user
+
+    group = user.group
+
+    context = {
+        'group': group,
+        'group_id': group.group_id if group else None,
+        'group_name': group.group_name if group else None,
+        'organisation': group.organisation if group else None,
+    }
+
+    return render(request, 'profile.html', context)
+
+
+def test_email(request):
+    try:
+        send_mail(
+            "Test Subject",
+            "Test body",
+            settings.DEFAULT_FROM_EMAIL,
+            ["support@phantom-load.in"],
+            fail_silently=False,
+        )
+        return HttpResponse("SUCCESS: Email sent")
+    except Exception as e:
+        return HttpResponse(f"FAILED: {repr(e)}")
+# views.py
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Group
+
+@api_view(['GET'])
+def get_group_by_id(request):
+    group_id = request.GET.get('group_id')
+
+    try:
+        group = Group.objects.get(group_id=group_id)
+        return Response({
+            "valid": True,
+            "group_name": group.group_name
+        })
+    except Group.DoesNotExist:
+        return Response({
+            "valid": False,
+            "group_name": None
+        })

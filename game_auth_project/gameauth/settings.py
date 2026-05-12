@@ -1,4 +1,6 @@
 from datetime import timedelta
+
+from dotenv import load_dotenv
 import os
 from pathlib import Path
 
@@ -121,7 +123,7 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*']
 
 LOGIN_REDIRECT_URL = '/home/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-
+load_dotenv()
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -130,15 +132,15 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-
+from django.core.mail import send_mail
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.zeptomail.in'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'support@phantom-load.in'
-EMAIL_HOST_PASSWORD = 'jayt wswx zjqr onwx'
-DEFAULT_FROM_EMAIL = 'support@phantom-load.in'
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = '"Phantom Load" <support@phantom-load.in>'
 SERVER_EMAIL = 'support@phantom-load.in'
 
 ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Phantom Load - '
@@ -182,7 +184,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://127.0.0.1:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -210,3 +213,8 @@ CORS_ALLOW_METHODS = [
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SAMESITE = 'Lax'
+MAX_CONCURRENT_USERS = 2
+
+# VERY IMPORTANT – long session for Unity gameplay
+SESSION_COOKIE_AGE = 12 * 60 * 60   # 12 hours
+SESSION_SAVE_EVERY_REQUEST = True
