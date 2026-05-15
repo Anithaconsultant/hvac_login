@@ -120,6 +120,11 @@
     </div>
 
     <div class="auth-container">
+
+      {% with current_page=request.resolver_match.url_name %}
+
+      {% if current_page == 'home' or current_page == 'about' or current_page == 'profile' or current_page == 'leaderboard' or current_page == 'feedback' or current_page == 'credits' or current_page == 'view_progress' %}
+
       {% if user.is_authenticated %}
       <div class="topbar-align">
         <div class="homeicon">
@@ -135,18 +140,29 @@
             </div>
           </a>
         </div>
+
         <div class="login_text">
           <a href="{% url 'account_logout' %}">Logout</a>
         </div>
       </div>
+
       {% else %}
+
       <div class="topbar-align">
         <div class="login_text">
           <a href="{% url 'account_login' %}">Register/Login</a>
         </div>
       </div>
-      {% endif %}
+
+      {% endif %}x
+      {% endif %}x
+
+      
+
+      {% endwith %}
+
       {% block content %}{% endblock %}
+
     </div>
   </div>
 

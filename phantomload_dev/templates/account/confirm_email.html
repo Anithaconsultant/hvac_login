@@ -6,12 +6,13 @@
     <div class="logo-container ">
         <div class="logo top-right-logo"></div>
     </div>
+    {{ request.resolver_match.url_name }}
     <div class="confirm-content">
         <h1 class="auth-title">Verify your email address</h1>
 
         <div class="auth-message">
             <p>We have sent an email to you for verification.</p>
-            <p>Follow the link provided to finalize the signup process.</p>
+            <p>Follow the link provided to finalise the signup process.</p>
         </div>
 
         <div class="auth-note">

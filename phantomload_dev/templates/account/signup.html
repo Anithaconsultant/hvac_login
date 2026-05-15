@@ -23,32 +23,7 @@
 
         {% csrf_token %}
 
-        <div class="required-wrapper">
-          {{ form.email|as_crispy_field }}
-        </div>
-        <div class="required-wrapper">
-          {{ form.first_name|as_crispy_field }}
-        </div>
-        <div class="required-wrapper">
-          {{ form.last_name|as_crispy_field }}
-        </div>
-        <div class="required-wrapper">
-          {{ form.nickname|as_crispy_field }}
-        </div>
-        <div class="required-wrapper">
-          {{ form.gender|as_crispy_field }}
-        </div>
-        <div class="required-wrapper">
-          {{ form.group_id|as_crispy_field }}
-        </div>
-        <div class="required-wrapper">
-          {{ form.country|as_crispy_field }}
-        </div>
-        <div class="required-wrapper">
-          {{ form.mobile_number|as_crispy_field }}
-        </div>
-
-        {{ form.password1|as_crispy_field }}
+        {{ form|crispy }}
 
         <div class="auth-btn-container">
 

@@ -57,7 +57,7 @@ def generate_group_id():
 class CustomUser(AbstractUser):
     username = None
 
-    id = models.CharField(
+    user_id = models.CharField(
         primary_key=True,
         max_length=8,
         unique=True,

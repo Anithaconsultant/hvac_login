@@ -7,7 +7,7 @@
     <div class="logo top-right-logo"></div>
 </div>
 <div class="profile-container">
-    <div class="homeicon">
+    <!-- <div class="homeicon">
         <a href="{% url 'home' %}" style="text-decoration: none;">
             <div style="display: inline-block; margin: 10px; cursor: pointer;" title="Home">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -19,15 +19,21 @@
                 </svg>
             </div>
         </a>
-    </div>
+    </div> -->
 
     <div class="profile-content">
+        <h1 class="auth-title">My Profile</h1>
         <div class="textcontent">
-            <h1 class="auth-title">My Profile</h1>
+            
             <div class="profile-inner-content">
                 <div class="profile-text">
                     <p>Welcome, {{ user.nickname }}!</p>
                     <p>Email: {{ user.email }}</p>
+                    <p>Group ID: {{ group_id }}</p>
+
+                    <p>Group Name: {{ group_name }}</p>
+
+                    <p>Organisation: {{ organisation }}</p>
                 </div>
 
                 <!-- Add more profile information as needed -->

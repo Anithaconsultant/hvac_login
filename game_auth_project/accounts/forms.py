@@ -55,7 +55,7 @@ class CustomUserCreationForm(SignupForm):
             'first_name': 'First Name',
             'last_name': 'Last Name',
             'nickname': 'Nickname ',
-            'mobile_number': 'Enter number (no country code)',
+            'mobile_number': 'Mobile number (no country code)',
             'password1': 'Set your password'
         }
 
@@ -87,7 +87,7 @@ class CustomUserCreationForm(SignupForm):
         )
         self.fields['group_id'].widget.attrs.update({
             'class': 'auth-form-control',
-            'placeholder': 'Enter Group ID',
+            'placeholder': 'Group ID (Enter only if an ID was given to you by your supervisor / faculty)',
             'autocomplete': 'off',
             'id': 'group_id_input'   # 👈 important for JS
         })
@@ -138,6 +138,14 @@ class CustomUserCreationForm(SignupForm):
                 parsed_number,
                 phonenumbers.PhoneNumberFormat.E164
             )
+
+            # ✅ CHECK DUPLICATE HERE
+            if CustomUser.objects.filter(
+                mobile_number=full_number
+            ).exists():
+                raise ValidationError(
+                    "This mobile number is already registered"
+                )
 
             self.cleaned_data['full_mobile_number'] = full_number
 

@@ -103,7 +103,7 @@ class GameProgressAPIView(APIView):
 @api_view(['POST'])
 def unity_logout(request):
     session_key = request.data.get("session_key")
-
+    print(session_key,"called")
     if not session_key:
         return Response({"error": "session_key is required"}, status=400)
 
@@ -113,64 +113,75 @@ def unity_logout(request):
 
 
 class ClientLoginView(APIView):
-    """
-    Custom login view for client authentication.
-    """
 
     def post(self, request):
+
         username = request.data.get('username')
         password = request.data.get('password')
 
         try:
-            user = User.objects.get(email=username)
+            db_user = User.objects.get(email=username)
+
         except User.DoesNotExist:
-            return Response({'detail': 'User not registered.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'detail': 'User not registered.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-        user = authenticate(request, email=username, password=password)
+        user = authenticate(
+            request,
+            username=db_user.email,
+            password=password
+        )
 
-        if user is not None:
-            if user.is_active:
+        print("AUTH USER:", user)
 
-                # ✅ STEP 1: CHECK GLOBAL LIMIT
-                allowed, error = can_user_login(user)
-                print("allowed:", allowed)
-                print("error:", error)
-                if not allowed:
-                    return Response({
-                        'detail': 'Maximum users reached. Try later.'
-                    }, status=status.HTTP_403_FORBIDDEN)
+        if user is None:
+            return Response(
+                {'detail': 'Invalid password.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
-                # ✅ STEP 2: CREATE UNITY SESSION
-                session_key = str(uuid.uuid4())
+        if not user.is_active:
+            return Response(
+                {'detail': 'User account is disabled.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
-                ActiveSession.objects.update_or_create(
-                    user=user,
-                    defaults={"session_key": session_key}
-                )
+        allowed, error = can_user_login(user)
 
-                # ✅ STEP 3: GENERATE TOKENS (UNCHANGED)
-                refresh = RefreshToken.for_user(user)
+        print("allowed:", allowed)
 
-                return Response({
-                    'status': 'success',
-                    'user_id': user.id,
-                    'email': user.email,
-                    'username': user.nickname,
+        if not allowed:
+            return Response({
+                'detail': 'Maximum users reached. Try later.'
+            }, status=status.HTTP_403_FORBIDDEN)
 
-                    # 🔥 OPTIONAL (good to send this)
-                    'session_key': session_key,
+        session_key = str(uuid.uuid4())
 
-                    'tokens': {
-                        'access': str(refresh.access_token),
-                        'refresh': str(refresh)
-                    }
-                }, status=status.HTTP_200_OK)
+        print("CREATING SESSION")
 
-            else:
-                return Response({'detail': 'User account is disabled.'}, status=status.HTTP_403_FORBIDDEN)
+        obj, created = ActiveSession.objects.update_or_create(
+            user=user,
+            defaults={"session_key": session_key}
+        )
 
-        else:
-            return Response({'detail': 'Invalid password.'}, status=status.HTTP_401_UNAUTHORIZED)
+        print("SESSION CREATED:", obj.id)
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'allowed':allowed,
+            'status': 'success',
+            'user_id': user.id,
+            'email': user.email,
+            'username': user.nickname,
+            'session_key': session_key,
+            'tokens': {
+                'access': str(refresh.access_token),
+                'refresh': str(refresh)
+            }
+        }, status=status.HTTP_200_OK)
 
 class UserDataView(APIView):
     def get(self, request, user_id):

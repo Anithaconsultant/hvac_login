@@ -32,43 +32,25 @@ from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
     path('api/client-login/', ClientLoginView.as_view(), name='client-login'),
-    # path('api/read-excel/', ReadExcelStaticView.as_view(), name='read-excel'),
-    path('api/task02-energybilldata/', ReadExcelAttemptView.as_view(),
-         name='read_excel_attempt'),
-    path('api/QAdata/', ReadQandAexcel.as_view(),
-         name='ReadQandAexcel'),
-    path('api/task08-quizdata/', ReadTask08excel.as_view(),
-         name='ReadTask08excel'),
-    path('api/task11-lightfixturedata/', Task11LightFixtureApi.as_view(),
-         name='Task11LightFixtureApi'),
-    path('api/task11-ticketFixesApi/', Task11TicketFixesApi.as_view(),
-         name='Task11TicketFixesApi'),
-    path('api/task11-lightingScenarioApi/', Task11LightingScenarioApi.as_view(),
-         name='Task11LightingScenarioApi'),
+    path('api/task02-energybilldata/', ReadExcelAttemptView.as_view(),name='read_excel_attempt'),
+    path('api/QAdata/', ReadQandAexcel.as_view(),name='ReadQandAexcel'),
+    path('api/task08-quizdata/', ReadTask08excel.as_view(),name='ReadTask08excel'),
+    path('api/task11-lightfixturedata/', Task11LightFixtureApi.as_view(),name='Task11LightFixtureApi'),
+    path('api/task11-ticketFixesApi/', Task11TicketFixesApi.as_view(),name='Task11TicketFixesApi'),
+    path('api/task11-lightingScenarioApi/', Task11LightingScenarioApi.as_view(),name='Task11LightingScenarioApi'),
     path('admin/', admin.site.urls),
     path('accounts/signup/', CustomSignupView.as_view(), name='account_signup'),
-    # path('accounts/login/', LoginView.as_view(), name='account_login'),
-    path('accounts/login/', LimitedLoginView.as_view(),
-         name='account_login'),   # UPDATED
-    
-
-    path("accounts/password/change/", CustomPasswordChangeView.as_view(),
-         name="account_change_password"),
-
-    path("accounts/confirm-email/<key>/",
-         CustomConfirmEmailView.as_view(),
-         name="account_confirm_email"),
+    path('accounts/login/', LimitedLoginView.as_view(),name='account_login'),   # UPDATED
+    path("accounts/password/change/", CustomPasswordChangeView.as_view(),name="account_change_password"),
+    path("accounts/confirm-email/<key>/", CustomConfirmEmailView.as_view(),name="account_confirm_email"),
     path('accounts/', include('allauth.urls')),
     path('', views.home_redirect, name='redirect-root'),  # Temporary redirect
     path('home/', views.home_view, name='home'),  # Actual home page view
     path('api/users/', views.UserListView.as_view(), name='user-list'),
-
     path('api/unity-logout/', unity_logout, name='unity_logout'),
-
     path('download_windows/', views.download_windows, name='download_windows'),
     path('download-mac/', views.download_mac, name='download_mac'),
-    path('update-progress/', views.update_game_progress,
-         name='update_game_progress'),
+    path('update-progress/', views.update_game_progress,name='update_game_progress'),
     path('view-progress/', views.view_progress, name='view_progress'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),
     path('feedback/', views.feedback_view, name='feedback'),

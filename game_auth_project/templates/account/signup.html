@@ -22,7 +22,8 @@
       <form method="POST" action="{% url 'account_signup' %}">
 
         {% csrf_token %}
-{{ form|crispy }}
+
+        {{ form|crispy }}
 
         <div class="auth-btn-container">
 
@@ -38,7 +39,8 @@
 
 
         </div>
-        <div style="color:#545cea; margin-top:20px;">Your data is safe with us and won't be used for commercial purposes.</div>
+        <div style="color:#545cea; margin-top:20px;">Your data is safe with us and won't be used for commercial
+          purposes.</div>
       </form>
 
     </div>

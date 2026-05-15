@@ -139,12 +139,21 @@ class CustomUserCreationForm(SignupForm):
                 phonenumbers.PhoneNumberFormat.E164
             )
 
+            # ✅ CHECK DUPLICATE HERE
+            if CustomUser.objects.filter(
+                mobile_number=full_number
+            ).exists():
+                raise ValidationError(
+                    "This mobile number is already registered"
+                )
+
             self.cleaned_data['full_mobile_number'] = full_number
 
         except phonenumbers.NumberParseException:
             raise ValidationError("Invalid phone number format")
 
         return mobile
+
 
     def save(self, request):
         user = super().save(request)

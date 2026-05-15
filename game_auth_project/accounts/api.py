@@ -173,6 +173,7 @@ class ClientLoginView(APIView):
         return Response({
             'allowed':allowed,
             'status': 'success',
+            'gender':user.gender,
             'user_id': user.id,
             'email': user.email,
             'username': user.nickname,

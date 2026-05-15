@@ -9,73 +9,66 @@
 
 <div class=" about-container">
 
-    <div class="homeicon">
-        <a href="{% url 'home' %}" style="text-decoration: none;">
-            <div style="display: inline-block; margin: 10px; cursor: pointer;" title="Home">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z"
-                        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M9 22V12H15V22" stroke="white" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
-            </div>
-        </a>
-    </div>
+    
+   
     <div class="about-content">
-        <h1 style="text-align: center;" class="auth-title">About Phantom Load</h1>
+        <h1 class="auth-title">About Phantom Load</h1>
         <div class=" text-content">
-            <div style="margin-bottom: 35px;">
-                <h5>What is this?</h5>
+            <div style="margin-bottom: 10px;">
+                <p class="head">What is this?</p>
 
-                <p>Phantom Load is an interactive 3D computer game set in a realistic building environment. This is an
-                    early
-                    version of the game. The final version will have multiple levels. </p>
+                <p>Phantom Load is an interactive 3D computer game set in a realistic building environment. Players
+                    explore the building, identify its components and energy use, investigate systems, improve the
+                    building performance, and lower carbon emissions.</p>
             </div>
-            <div style="margin-bottom: 35px;">
-                <h5>What is a 'phantom load'?</h5>
-                <p>A 'phantom load' is the "hidden" power that supports standby functions and instant-on capabilities,
-                    meaning devices draw electricity even when they appear to be "off." Essentially, it's any energy
-                    waste
-                    that creates no productive output. </p>
-            </div>
-            <div style="margin-bottom: 35px;">
-                <h5>Why should you play Phantom Load? </h5>
-                <p>Play to master the invisible forces of building energy efficiency and take a direct stand against
-                    climate
-                    change.</p>
-                <p>In this high-stakes simulation, you’ll hunt down hidden inefficiencies and optimize complex systems
-                    to
-                    achieve peak building performance. Every move you make to slash energy waste is a win for the
-                    planet.
-                </p>
-                <p>Don't just watch the crisis-jump in, solve the puzzle, and prove you can engineer a zero-carbon
-                    future.
+            <div style="margin-bottom: 10px;">
+                <p class="head">What is a 'phantom load'?</p>
+                <p>A phantom load is the electricity consumed by devices that remain plugged in even when they are not
+                    actively in use. This 'hidden' power is used for standby functions, remote control features, and
+                    instant-on capabilities. Devices draw energy even when they appear to be 'off.' A phantom load can
+                    be any energy use that does not give a productive output.
+                    In the game, you will hunt for these invisible energy drains and apply practical solutions to
+                    eliminate them.
+
                 </p>
             </div>
-            <div style="margin-bottom: 35px;">
+            <div style="margin-bottom: 10px;">
+                <p class="head">Why should you play Phantom Load? </p>
+                <p>Because it's fun! The game is all about understanding building science and energy flows. Making the
+                    invisible visible. You get your hands on building systems, seeing how they fail, and improve them.
+                    You spot inefficiencies and implement fixes.
+                    If you want a career in building performance, this is the way to start.
 
-                <h5>Who made this game?</h5>
-                <p>Phantom Load is developed by a team led by the Indian Institute for Human Settlements. </p>
+
+                </p>
             </div>
-            <div style="margin-bottom: 35px;">
+            <div style="margin-bottom: 10px;">
 
-                <h5>Need more information?</h5>
-                <p>write to us at <a href="mailto:support@phantom-load.in" >support@phantom-load.in</a></p>
+                <p class="head">Who made this game?</p>
+                <p>Phantom Load is developed by a team led by the Indian Institute for Human Settlements (IIHS), with financial support
+                    from Infosys Limited.
+                    This work is openly licensed via CC BY NC ND 4.0.
+
+                </p>
             </div>
-            <div style="margin-bottom: 35px;">
+            <div style="margin-bottom: 10px;">
 
-                <h5>Current Build #</h5>
+                <p class="head">Need more information?</p>
+                <p>Write to us at <a href="mailto:support@phantom-load.in">support@phantom-load.in</a></p>
+            </div>
+            <div style="margin-bottom: 10px;">
+
+                <p class="contentdummy">Current Build #</p>
                 <p>Version 2.0</a></p>
             </div>
-            <div style="margin-bottom: 35px;">
-                <h5>Copyrights</h5>
+            <div style="margin-bottom: 10px;">
+                <p class="contentdummy">Copyrights</p>
                 <p>Copyright © 2026 Indian Institute for Human Settlements </p>
                 <p>Made available via CC BY-NC-ND 4.0.</p>
-                <div class="about-linkalign">
-                <div><img src="{% static 'images/about.png' %}" alt="Phantom Load Logo" width="150" height="50"></div>
-                <div ><a href="{% url 'account_login'  %}">Click on the link to Register/Login</a></div>
+
+                <div><img src="{% static 'images/about.png' %}" alt="Phantom Load Logo" width="100" height="35">
                 </div>
+
             </div>
         </div>
     </div>
