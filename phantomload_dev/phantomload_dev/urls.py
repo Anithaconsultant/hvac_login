@@ -23,10 +23,7 @@ from accounts.views import (
     play_task
 )
 from accounts.api import CheckSessionView,get_userprogress,save_loadshredder_full,get_loadshredder_data,get_username,Task11LightingScenarioApi,unity_logout,CustomTokenObtainPairView,Task11TicketFixesApi, ReadTask08excel,ReadQandAexcel,RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, Task11LightFixtureApi
-from rest_framework_simplejwt.views import (
-    TokenRefreshView,
-    TokenVerifyView,
-)
+
 from accounts.views import CustomSignupView, CustomPasswordChangeView,LogoutView
 from allauth.account.views import LoginView
 from accounts import views
