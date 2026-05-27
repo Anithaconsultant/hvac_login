@@ -100,18 +100,48 @@ class GameProgressAPIView(APIView):
                 "message": "Internal server error"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+import json
+
 @api_view(['POST'])
 def unity_logout(request):
-    session_key = request.data.get("session_key")
-    print(session_key,"called")
+
+    print("API CALLED")
+
+    print("BODY:", request.body)
+
+    data = json.loads(request.body)
+
+    session_key = data.get("session_key")
+
+    print("SESSION:", session_key)
+
     if not session_key:
-        return Response({"error": "session_key is required"}, status=400)
+        return Response(
+            {"error": "session_key is required"},
+            status=400
+        )
 
-    ActiveSession.objects.filter(session_key=session_key).delete()
+    ActiveSession.objects.filter(
+        session_key=session_key
+    ).delete()
 
-    return Response({"message": "Logged out successfully"})
+    return Response({
+        "message": "Logged out successfully"
+    })
+    
+class CheckSessionView(APIView):
 
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+
+        active = ActiveSession.objects.filter(
+            user=request.user
+        ).exists()
+
+        return Response({
+            "active": active
+        })
 class ClientLoginView(APIView):
 
     def post(self, request):
@@ -173,6 +203,7 @@ class ClientLoginView(APIView):
         return Response({
             'allowed':allowed,
             'status': 'success',
+            'gender':user.gender,
             'user_id': user.id,
             'email': user.email,
             'username': user.nickname,

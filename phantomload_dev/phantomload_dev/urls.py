@@ -18,9 +18,11 @@ from accounts.views import (
     CustomPasswordChangeView,
     LimitedLoginView,
     reset_game_progress,
-    custom_logout
+    custom_logout,
+    unity_game_view,
+    play_task
 )
-from accounts.api import get_userprogress,save_loadshredder_full,get_loadshredder_data,get_username,Task11LightingScenarioApi,unity_logout,CustomTokenObtainPairView,Task11TicketFixesApi, ReadTask08excel,ReadQandAexcel,RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, Task11LightFixtureApi
+from accounts.api import CheckSessionView,get_userprogress,save_loadshredder_full,get_loadshredder_data,get_username,Task11LightingScenarioApi,unity_logout,CustomTokenObtainPairView,Task11TicketFixesApi, ReadTask08excel,ReadQandAexcel,RegisterView, ClientLoginView, UserDataView, ReadExcelAttemptView, Task11LightFixtureApi
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
@@ -64,7 +66,9 @@ urlpatterns = [
     path('api/post_loadshredderscore/', save_loadshredder_full, name='save_loadshredder_full'),
     path('api/reset_game_progress/', reset_game_progress, name='reset_game_progress'),
     path('api/logout/', views.custom_logout, name='custom_logout'),
-
+    path("api/check-session/", CheckSessionView.as_view(),name="check-session"),
+    path("Integrated_Build/",unity_game_view,name="Integrated_Build"),
+    path("play-task/<str:task_name>/",views.play_task,name="play_task")
 ]
 
 if settings.DEBUG:

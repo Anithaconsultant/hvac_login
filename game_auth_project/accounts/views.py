@@ -29,7 +29,7 @@ from django.utils import timezone
 from .utils import can_user_login
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from rest_framework_simplejwt.tokens import AccessToken
 User = get_user_model()
 
 class LimitedLoginView(LoginView):
@@ -155,7 +155,7 @@ def home_redirect(request):
     """Redirect root URL to appropriate location"""
     if request.user.is_authenticated:
         return redirect('home')  # Goes to the actual home view
-    return redirect('about')  # Goes to allauth login
+    return redirect('account_login')  # Goes to allauth login
 
 
 @login_required
@@ -308,7 +308,25 @@ def update_game_progress(request):
 
 
 
+@login_required
+def unity_game_view(request):
 
+    user = request.user
+
+    token = str(AccessToken.for_user(user))
+
+    return render(
+        request,
+        "unity_game.html",
+        {
+            "jwt_token": token,
+            "username": user.nickname,
+            "user_id": str(user.id),
+            "user_email": user.email,
+            "user_gender": user.gender,
+        }
+    )
+    
 @csrf_exempt
 def reset_game_progress(request):
     if request.method == 'POST':

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <title>{{ task_name }}</title>
+
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png"
+        href="https://dev.phantom-load.in/apps/Tasks/{{ task_name }}/TemplateData/favicon.png?v=2">
+
+    <link rel="shortcut icon" type="image/png"
+        href="https://dev.phantom-load.in/apps/Tasks/{{ task_name }}/TemplateData/favicon.png?v=2">
+
+    <link rel="stylesheet" href="https://dev.phantom-load.in/apps/Tasks/{{ task_name }}/TemplateData/style.css">
+
+    <!-- USER DATA -->
+    <script>
+
+        window.gameAuthToken = "{{ jwt_token|escapejs }}";
+        window.username = "{{ username|escapejs }}";
+        window.userId = "{{ user_id|escapejs }}";
+        window.userEmail = "{{ user_email|escapejs }}";
+        window.userGender = "{{ user_gender|escapejs }}";
+
+        console.log("TOKEN:", window.gameAuthToken);
+        console.log("USERNAME:", window.username);
+        console.log("USER ID:", window.userId);
+        console.log("EMAIL:", window.userEmail);
+        console.log("GENDER:", window.userGender);
+
+    </script>
+
+</head>
+
+<body>
+
+    <div id="unity-container" class="unity-desktop">
+
+        <canvas id="unity-canvas" width="1280" height="720" tabindex="-1"></canvas>
+
+        <!-- LOADING -->
+
+        <div id="unity-loading-bar">
+
+            <div id="unity-logo"></div>
+
+            <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
+            </div>
+
+            <div id="unity-loading-text">
+                This may take a few minutes
+            </div>
+
+        </div>
+
+        <!-- WARNINGS -->
+
+        <div id="unity-warning"></div>
+
+        <!-- FOOTER -->
+
+        <div id="unity-footer">
+
+            <div id="unity-logo-title-footer"></div>
+
+            <div id="unity-fullscreen-button"></div>
+
+            <div id="unity-build-title">
+                {{ task_name }}
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const taskName = "{{ task_name }}";
+
+        const buildUrl =
+            "https://dev.phantom-load.in/apps/Tasks/" +
+            taskName +
+            "/Build";
+
+        const loaderUrl =
+            buildUrl +
+            "/Build.loader.js";
+
+        const canvas =
+            document.querySelector("#unity-canvas");
+
+        // ==========================================
+        // WARNING BANNER
+        // ==========================================
+
+        function unityShowBanner(msg, type) {
+
+            const warningBanner =
+                document.querySelector("#unity-warning");
+
+            function updateBannerVisibility() {
+
+                warningBanner.style.display =
+                    warningBanner.children.length
+                        ? "block"
+                        : "none";
+            }
+
+            const div =
+                document.createElement("div");
+
+            div.innerHTML = msg;
+
+            warningBanner.appendChild(div);
+
+            if (type === "error") {
+
+                div.style =
+                    "background:red;padding:10px;";
+
+            } else {
+
+                if (type === "warning") {
+
+                    div.style =
+                        "background:yellow;padding:10px;";
+                }
+
+                setTimeout(() => {
+
+                    warningBanner.removeChild(div);
+
+                    updateBannerVisibility();
+
+                }, 5000);
+            }
+
+            updateBannerVisibility();
+        }
+
+        // ==========================================
+        // UNITY CONFIG
+        // ==========================================
+
+        const config = {
+
+            arguments: [],
+
+            dataUrl:
+                buildUrl +
+                "/Build.data",
+
+            frameworkUrl:
+                buildUrl +
+                "/Build.framework.js",
+
+            codeUrl:
+                buildUrl +
+                "/Build.wasm",
+
+            streamingAssetsUrl:
+                "https://dev.phantom-load.in/apps/Tasks/" +
+                taskName +
+                "/StreamingAssets",
+
+            companyName: "IIHS",
+
+            productName: taskName,
+
+            productVersion: "1.0",
+
+            showBanner: unityShowBanner
+        };
+
+        // ==========================================
+        // MOBILE
+        // ==========================================
+
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+
+            const meta =
+                document.createElement("meta");
+
+            meta.name = "viewport";
+
+            meta.content =
+                "width=device-width,height=device-height,initial-scale=1.0,user-scalable=no,shrink-to-fit=yes";
+
+            document.head.appendChild(meta);
+
+            document.querySelector("#unity-container")
+                .className = "unity-mobile";
+
+            canvas.className = "unity-mobile";
+
+        } else {
+
+            canvas.style.width = "1280px";
+            canvas.style.height = "720px";
+        }
+
+        // ==========================================
+        // BACKGROUND IMAGE
+        // ==========================================
+
+        canvas.style.background =
+            "url('" +
+            buildUrl +
+            "/Build.jpg') center / cover";
+
+        // ==========================================
+        // SHOW LOADING
+        // ==========================================
+
+        document.querySelector("#unity-loading-bar")
+            .style.display = "block";
+
+        // ==========================================
+        // LOAD UNITY
+        // ==========================================
+
+        const script =
+            document.createElement("script");
+
+        script.src = loaderUrl;
+
+        script.onload = () => {
+
+            console.log("TASK LOADER LOADED");
+
+            createUnityInstance(
+                canvas,
+                config,
+
+                (progress) => {
+
+                    document.querySelector(
+                        "#unity-progress-bar-full"
+                    ).style.width =
+                        (100 * progress) + "%";
+                }
+
+            ).then((unityInstance) => {
+
+                console.log("TASK LOADED");
+
+                document.querySelector(
+                    "#unity-loading-bar"
+                ).style.display = "none";
+
+                document.querySelector(
+                    "#unity-fullscreen-button"
+                ).onclick = () => {
+
+                    unityInstance.SetFullscreen(1);
+                };
+
+            }).catch((message) => {
+
+                console.error(message);
+
+                alert(message);
+            });
+        };
+
+        document.body.appendChild(script);
+
+    </script>
+
+</body>
+
+</html>

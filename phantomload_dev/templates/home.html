@@ -49,9 +49,30 @@
     </div> -->
     <div class="image-cover">
       <div class="requirement-image">
-        <a target="_blank" class="play-btn" href="https://dev.phantom-load.in/apps/Integrated_Build">
+        <a target="_blank" class="play-btn" href="{% url 'Integrated_Build' %}">
           Play Now
         </a>
+        <div class="taskList">
+        <a  target="_blank" href="{% url 'play_task' 'Task01' %}">
+          Task 01
+        </a>
+
+        <a  target="_blank" href="{% url 'play_task' 'Task02' %}">
+          Task 02
+        </a>
+
+        <a  target="_blank" href="{% url 'play_task' 'Task07' %}">
+          Task 07
+        </a>
+
+        <a target="_blank"  href="{% url 'play_task' 'Task09' %}">
+          Task 09
+        </a>
+
+        <a  target="_blank" href="{% url 'play_task' 'Task11' %}">
+          Task 11
+        </a>
+        </div>
       </div>
     </div>
   </div>

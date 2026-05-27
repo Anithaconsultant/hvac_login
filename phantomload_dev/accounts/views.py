@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from .forms import FeedbackForm, CustomUserCreationForm
 from .models import UserGameProgress, CustomUser, ActiveSession,UserGameProgress, LoadShredderRecord,Leaderboard
 from django.contrib.auth.decorators import login_required
+from rest_framework_simplejwt.tokens import AccessToken
 from django.db.models import Case, When, Value, IntegerField
 import os
 import json
@@ -65,6 +66,77 @@ class LimitedLoginView(LoginView):
 
         return response
 
+
+@login_required
+def unity_game_view(request):
+
+    user = request.user
+
+    token = str(AccessToken.for_user(user))
+
+    return render(
+        request,
+        "unity_game.html",
+        {
+            "jwt_token": token,
+            "username": user.nickname,
+            "user_id": str(user.id),
+            "user_email": user.email,
+            "user_gender": user.gender,
+        }
+    )
+from uuid import uuid4
+@login_required
+def play_task(request, task_name):
+
+    existing_session = ActiveSession.objects.filter(
+        user=request.user,
+        task_name=task_name,
+        is_active=True
+    ).exists()
+
+    if existing_session:
+
+        return render(
+            request,
+            "task_already_open.html",
+            {
+                "task_name": task_name
+            }
+        )
+
+    session_id = str(uuid4())
+
+    ActiveSession.objects.create(
+        user=request.user,
+        session_key=request.session.session_key,
+        task_name=task_name,
+        session_id=session_id,
+        is_active=True,
+        last_heartbeat=timezone.now()
+    )
+
+    token = str(
+        AccessToken.for_user(
+            request.user
+        )
+    )
+
+    return render(
+        request,
+        "play_task.html",
+        {
+            "task_name": task_name,
+
+            "session_id": session_id,
+
+            "jwt_token": token,
+            "username": request.user.nickname,
+            "user_id": request.user.id,
+            "user_email": request.user.email,
+            "user_gender": request.user.gender,
+        }
+    )
 def custom_logout(request):
 
     if request.user.is_authenticated:
@@ -155,7 +227,7 @@ def home_redirect(request):
     """Redirect root URL to appropriate location"""
     if request.user.is_authenticated:
         return redirect('home')  # Goes to the actual home view
-    return redirect('about')  # Goes to allauth login
+    return redirect('account_login')  # Goes to allauth login
 
 
 @login_required
@@ -547,7 +619,18 @@ def credits(request):
 
 @login_required
 def profile(request):
-    return render(request, 'profile.html')
+    user = request.user
+
+    group = user.group
+
+    context = {
+        'group': group,
+        'group_id': group.group_id if group else None,
+        'group_name': group.group_name if group else None,
+        'organisation': group.organisation if group else None,
+    }
+
+    return render(request, 'profile.html', context)
 
 
 def test_email(request):

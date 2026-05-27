@@ -49,7 +49,9 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, first_name, last_name, password, **extra_fields)
-    
+   
+
+        
 def generate_group_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
 

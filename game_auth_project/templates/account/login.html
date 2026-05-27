@@ -6,17 +6,48 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="video-login-container">
+
+<!-- ================= INTRO SCREEN ================= -->
+<div id="intro-video-container">
+
+  <!-- BACKGROUND IMAGE -->
+  <div id="intro-bg"></div>
+
+  <!-- VIDEO -->
+  <video id="intro-video" playsinline preload="auto">
+
+    <source src="{% static 'video/logo_animation.mp4' %}" type="video/mp4">
+
+    Your browser does not support the video tag.
+
+  </video>
+
+  <!-- OVERLAY CONTENT -->
+  <div id="overlay-content">
+
+    <!-- PLAY BUTTON -->
+    <div id="play-btn">
+      <div class="play-icon"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= LOGIN PAGE ================= -->
+<div class="video-login-container" id="main-login-page" style="display:none;">
 
   <div id="login-container" class="active">
+
     <div class="welcomeText">
       <div class="logo"></div>
     </div>
 
     <div class="login-content">
+
       <h1 class="auth-title">Login</h1>
 
-      <!-- ================= SERVER LIMIT ERROR ================= -->
+      <!-- SERVER LIMIT ERROR -->
       {% if messages %}
       {% for message in messages %}
       {% if 'limit_error' in message.tags %}
@@ -27,8 +58,7 @@
       {% endfor %}
       {% endif %}
 
-
-      <!-- ================= INVALID LOGIN ERROR ================= -->
+      <!-- INVALID LOGIN -->
       {% if form.non_field_errors %}
       <div class="alert alert-danger" id="login-error">
         {% for error in form.non_field_errors %}
@@ -38,6 +68,7 @@
       {% endif %}
 
       <form method="POST" action="{% url 'account_login' %}" id="login-form">
+
         {% csrf_token %}
 
         <div class="form-group">
@@ -49,39 +80,214 @@
         </div>
 
         <div class="auth-btn-container">
+
           <a href="{% url 'account_signup' %}" class="auth-link"
             style="margin-top:5px;font-size:20px;font-weight:bold;">
+
             Register
+
           </a>
 
           <button type="submit" class="auth-btn loginbtn">
             Login
           </button>
+
         </div>
 
         <a href="{% url 'account_reset_password' %}" class="auth-link" style="float:right;margin-top:10px;">
+
           Forgot Password?
+
         </a>
+
       </form>
 
     </div>
+
   </div>
+
 </div>
 
-<!-- ================= CLEAN & SAFE JS ================= -->
+<!-- ================= CSS ================= -->
+<style>
+  /* FULL SCREEN */
+  #intro-video-container {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 9999;
+    background: transparent;
+  }
+
+  /* BACKGROUND IMAGE */
+  #intro-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  /* VIDEO */
+  #intro-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    z-index: 5;
+
+  }
+
+  /* CONTENT */
+  #overlay-content {
+    position: relative;
+    z-index: 10;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* LOGO CONTAINER */
+  #phantom-logo {
+
+    width: 500px;
+    max-width: 92%;
+    opacity: 1;
+    position: relative;
+
+    filter:
+      drop-shadow(0 0 20px rgba(255, 255, 255, 0.12));
+  }
+
+
+  /* PLAY BUTTON */
+  #play-btn {
+
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 50px;
+    /* border-radius: 50%; */
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    z-index: 20;
+  }
+
+
+  /* INNER GLOW */
+
+
+
+  /* PLAY ICON */
+  .play-icon {
+    background-image: url("{% static 'images/play.png' %}");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    width: 240px;
+    height: 173px;
+
+    display: block;
+  }
+
+
+  /* HOVER */
+  #play-btn:hover {
+
+    transform: translate(-50%, -50%) scale(1.08);
+
+    text-shadow:
+      0 0 25px rgba(46, 196, 79, 1),
+      0 0 55px rgba(46, 196, 79, 0.85);
+
+  }
+
+  /* FADE */
+  .fade-out {
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+</style>
+
+<!-- ================= JS ================= -->
 <script>
+
   document.addEventListener('DOMContentLoaded', function () {
+
+    const introVideo = document.getElementById('intro-video');
+
+    const introContainer = document.getElementById('intro-video-container');
+
+    const loginPage = document.getElementById('main-login-page');
+
+    const playBtn = document.getElementById('play-btn');
+
+    const overlayContent = document.getElementById('overlay-content');
+
     const loginError = document.getElementById('login-error');
 
-    // Hide invalid login error when user starts typing
+    // PLAY BUTTON CLICK
+    playBtn.addEventListener('click', function () {
+
+      // hide overlay
+      overlayContent.style.display = 'none';
+
+      // show video
+      introVideo.style.display = 'block';
+
+      // enable audio
+      introVideo.muted = false;
+
+      // play
+      introVideo.play();
+
+    });
+
+    // VIDEO ENDED
+    introVideo.addEventListener('ended', function () {
+
+      introContainer.classList.add('fade-out');
+
+      setTimeout(() => {
+
+        introContainer.style.display = 'none';
+
+        loginPage.style.display = 'block';
+
+      }, 1000);
+
+    });
+
+    // HIDE LOGIN ERROR ON INPUT
     if (loginError) {
+
       document.querySelectorAll('#login-form input').forEach(input => {
+
         input.addEventListener('input', () => {
+
           loginError.style.display = 'none';
+
         });
+
       });
+
     }
+
   });
+
 </script>
 
 {% endblock %}
