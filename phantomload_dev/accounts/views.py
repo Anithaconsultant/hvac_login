@@ -1,3 +1,6 @@
+from datetime import timedelta
+import uuid
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models.functions import Cast
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
@@ -11,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from .forms import FeedbackForm, CustomUserCreationForm
-from .models import UserGameProgress, CustomUser, ActiveSession,UserGameProgress, LoadShredderRecord,Leaderboard
+from .models import WebGLSession,UserGameProgress, CustomUser, ActiveSession,UserGameProgress, LoadShredderRecord,Leaderboard
 from django.contrib.auth.decorators import login_required
 from rest_framework_simplejwt.tokens import AccessToken
 from django.db.models import Case, When, Value, IntegerField
@@ -27,10 +30,10 @@ from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.dispatch import receiver
 from django.utils import timezone
-from .utils import can_user_login
+from .utils import can_user_login,has_active_webgl_session,cleanup_dead_sessions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from uuid import uuid4
 User = get_user_model()
 
 class LimitedLoginView(LoginView):
@@ -65,37 +68,153 @@ class LimitedLoginView(LoginView):
         )
 
         return response
+    
+    
+# @login_required
+# def unity_game_view(request):
 
+#     user = request.user
 
+#     # ==========================================
+#     # AUTO CLOSE DEAD SESSIONS
+#     # ==========================================
+
+#     WebGLSession.objects.filter(
+#         user=user,
+#         is_alive=True,
+#         last_ping__lt=timezone.now() - timedelta(seconds=40)
+#     ).update(
+#         is_alive=False,
+#         status="closed"
+#     )
+
+#     # ==========================================
+#     # CHECK ACTIVE SESSION
+#     # ==========================================
+
+#     active_session = WebGLSession.objects.filter(
+#         user=user,
+#         is_alive=True
+#     ).first()
+
+#     if active_session:
+
+#         return render(
+#             request,
+#             "task_already_open.html",
+#             {
+#                 "message":
+#                 "Another session is already open."
+#             }
+#         )
+
+#     # ==========================================
+#     # CREATE NEW SESSION
+#     # ==========================================
+
+#     session_id = str(uuid.uuid4())
+
+#     WebGLSession.objects.create(
+#         user=user,
+#         session_id=session_id,
+#         browser_session_key=request.session.session_key,
+#         status="active",
+#         is_alive=True
+#     )
+
+#     token = str(
+#         AccessToken.for_user(user)
+#     )
+
+#     return render(
+#         request,
+#         "unity_game.html",
+#         {
+#             "jwt_token": token,
+#             "username": user.nickname,
+#             "user_id": str(user.id),
+#             "user_email": user.email,
+#             "user_gender": user.gender,
+#             "webgl_session_id": session_id
+#         }
+#     )
+
+MAX_CONCURRENT_WEBGL_USERS = 2
+ACTIVE_TIMEOUT_SECONDS=60*5
 @login_required
 def unity_game_view(request):
-
     user = request.user
 
-    token = str(AccessToken.for_user(user))
+    cleanup_dead_sessions()
+
+    active_sessions_count = WebGLSession.objects.filter(
+        status="active",
+        is_alive=True,
+        last_ping__gte=timezone.now() - timedelta(seconds=ACTIVE_TIMEOUT_SECONDS)
+    ).count()
+
+    if active_sessions_count >= MAX_CONCURRENT_WEBGL_USERS:
+        return render(
+            request,
+            "max_users_reached.html",
+            {"message": f"Maximum {MAX_CONCURRENT_WEBGL_USERS} users are playing now. Try later."}
+        )
+
+
+    if has_active_webgl_session(user):
+        return render(
+            request,
+            "task_already_open.html",
+            {"message": "You already have an active session."}
+        )
+
+    # ------------------------------
+    # ENSURE SESSION KEY EXISTS
+    # ------------------------------
+    if not request.session.session_key:
+        request.session.create()
+
+    # ------------------------------
+    # CREATE NEW WEBGL SESSION
+    # ------------------------------
+    session_id = str(uuid.uuid4())
+    WebGLSession.objects.create(
+        user=user,
+        session_id=session_id,
+        browser_session_key=request.session.session_key,
+        status="active",
+        is_alive=True
+    )
+
+    # ------------------------------
+    # CREATE JWT TOKEN
+    # ------------------------------
+    refresh = RefreshToken.for_user(user)
+
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)
 
     return render(
         request,
         "unity_game.html",
         {
-            "jwt_token": token,
-            "username": user.nickname,
-            "user_id": str(user.id),
-            "user_email": user.email,
-            "user_gender": user.gender,
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "username": user.nickname,
+        "user_id": str(user.id),
+        "user_email": user.email,
+        "user_gender": user.gender,
+        "webgl_session_id": session_id
         }
     )
-from uuid import uuid4
+
 @login_required
 def play_task(request, task_name):
 
-    existing_session = ActiveSession.objects.filter(
-        user=request.user,
-        task_name=task_name,
-        is_active=True
-    ).exists()
+    user = request.user
 
-    if existing_session:
+    # prevent multiple active sessions
+    if has_active_webgl_session(user):
 
         return render(
             request,
@@ -105,50 +224,53 @@ def play_task(request, task_name):
             }
         )
 
-    session_id = str(uuid4())
+    # ensure session exists
+    if not request.session.session_key:
+        request.session.create()
 
-    ActiveSession.objects.create(
-        user=request.user,
-        session_key=request.session.session_key,
-        task_name=task_name,
-        session_id=session_id,
-        is_active=True,
-        last_heartbeat=timezone.now()
+    # create webgl session
+    webgl_session = WebGLSession.objects.create(
+        user=user,
+        session_id=str(uuid.uuid4()),
+        browser_session_key=request.session.session_key,
+        status="active",
+        is_alive=True
     )
 
-    token = str(
-        AccessToken.for_user(
-            request.user
-        )
-    )
+    # jwt token
+    refresh = RefreshToken.for_user(user)
 
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)
+    print("play_task_seesion_id",webgl_session.session_id)
     return render(
         request,
         "play_task.html",
         {
             "task_name": task_name,
+            "webgl_session_id": webgl_session.session_id,
 
-            "session_id": session_id,
+            "access_token": access_token,
+            "refresh_token": refresh_token,
 
-            "jwt_token": token,
             "username": request.user.nickname,
             "user_id": request.user.id,
             "user_email": request.user.email,
             "user_gender": request.user.gender,
         }
     )
+    
 def custom_logout(request):
 
-    if request.user.is_authenticated:
+    user = request.user
 
-        ActiveSession.objects.filter(
-            user=request.user
-        ).delete()
+    if user.is_authenticated:
+        ActiveSession.objects.filter(user=user).delete()
 
-    logout(request)
 
-    return redirect('account_login')
+        logout(request)
 
+    return redirect("account_login")   # ✔ THIS WORKS
 
 class CustomPasswordChangeView(PasswordChangeView):
     def form_valid(self, form):
@@ -242,14 +364,14 @@ class CustomEmailVerificationSentView(TemplateView):
     template_name = "account/confirm_email.html"
 
 
-class UserListView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+# class UserListView(APIView):
+#     authentication_classes = [JWTAuthentication]
+#     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        users = CustomUser.objects.all()
-        serializer = CustomUserSerializer(users, many=True)
-        return Response(serializer.data)
+#     def get(self, request):
+#         users = CustomUser.objects.all()
+#         serializer = CustomUserSerializer(users, many=True)
+#         return Response(serializer.data)
 
 
 def confirm_payment(request):

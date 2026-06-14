@@ -13,18 +13,15 @@
     <!-- UNITY CSS -->
     <!-- ============================== -->
 
-   <!-- FAVICON -->
-    <link rel="icon"
-          type="image/png"
-          href="https://dev.phantom-load.in/apps/Integrated_Build/TemplateData/favicon.png?v=2">
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png"
+        href="https://dev.phantom-load.in/apps/Integrated_Build/TemplateData/favicon.png?v=2">
 
-    <link rel="shortcut icon"
-          type="image/png"
-          href="https://dev.phantom-load.in/apps/Integrated_Build/TemplateData/favicon.png?v=2">
+    <link rel="shortcut icon" type="image/png"
+        href="https://dev.phantom-load.in/apps/Integrated_Build/TemplateData/favicon.png?v=2">
 
     <!-- UNITY CSS -->
-    <link rel="stylesheet"
-          href="https://dev.phantom-load.in/apps/Integrated_Build/TemplateData/style.css">
+    <link rel="stylesheet" href="https://dev.phantom-load.in/apps/Integrated_Build/TemplateData/style.css">
 
     <!-- ============================== -->
     <!-- JWT + USER DATA -->
@@ -41,8 +38,10 @@
         window.userEmail = "{{ user_email|escapejs }}";
 
         window.userGender = "{{ user_gender|escapejs }}";
+        window.webglSessionId = "{{ webgl_session_id|escapejs }}";
 
         console.log("TOKEN:", window.gameAuthToken);
+        console.log("webglSessionId:", window.webglSessionId);
 
         console.log("USERNAME:", window.username);
 
@@ -298,7 +297,212 @@
         document.body.appendChild(script);
 
     </script>
+    <script>
+        // ==========================================
+        // SESSION VARIABLES
+        // ==========================================
 
+        const SESSION_ID =
+            "{{ webgl_session_id }}";
+
+        let ACCESS_TOKEN =
+            "{{ access_token|escapejs }}";
+
+        const REFRESH_TOKEN =
+            "{{ refresh_token|escapejs }}";
+
+        // ==========================================
+        // HEARTBEAT
+        // ==========================================
+        async function refreshAccessToken() {
+            console.log(
+                "Refreshing token..."
+            );
+            try {
+
+                const response = await fetch(
+                    "/api/refresh/token/",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            refresh: REFRESH_TOKEN
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+
+                    console.error(
+                        "Token refresh failed"
+                    );
+
+                    return false;
+                }
+
+                const data =
+                    await response.json();
+
+                ACCESS_TOKEN =
+                    data.access;
+
+                console.log(
+                    "Access token refreshed"
+                );
+
+                return true;
+
+            } catch (error) {
+
+                console.error(
+                    "Refresh error:",
+                    error
+                );
+
+                return false;
+            }
+        }
+        async function sendHeartbeat() {
+
+            try {
+
+                const response = await fetch(
+                    "/api/webgl/ping/",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization":
+                                "Bearer " + ACCESS_TOKEN
+                        },
+
+                        body: JSON.stringify({
+                            session_id: SESSION_ID
+                        })
+                    }
+                );
+
+                // ==========================
+                // LOGGED OUT
+                // ==========================
+
+                if (
+                    response.status === 401 ||
+                    response.status === 403
+                ) {
+
+                    console.log(
+                        "Access token expired"
+                    );
+
+                    const refreshed =
+                        await refreshAccessToken();
+
+                    if (refreshed) {
+
+                        console.log(
+                            "Retrying heartbeat"
+                        );
+
+                        return sendHeartbeat();
+                    }
+
+                    alert(
+                        "Login expired."
+                    );
+
+                    window.location.href =
+                        "/accounts/login/";
+
+                    return;
+                }
+
+                // ==========================
+                // INVALID SESSION
+                // ==========================
+
+                if (response.status === 400) {
+
+                    alert(
+                        "Session closed."
+                    );
+
+                    window.location.href =
+                        "/home/";
+
+                    return;
+                }
+
+                // ==========================
+                // OTHER ERRORS
+                // ==========================
+
+                if (!response.ok) {
+
+                    console.error(
+                        "Heartbeat failed:",
+                        response.status
+                    );
+
+                    return;
+                }
+
+                // ==========================
+                // SUCCESS
+                // ==========================
+
+                const data =
+                    await response.json();
+
+                console.log(
+                    "Heartbeat success:",
+                    SESSION_ID,
+                    new Date().toISOString()
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Heartbeat error:",
+                    error
+                );
+            }
+        }
+
+
+        sendHeartbeat();
+
+
+        setInterval(
+            sendHeartbeat,
+            30000
+        );
+
+
+        window.addEventListener("beforeunload", function () {
+
+            fetch("/api/webgl/close/", {
+                method: "POST",
+                keepalive: true,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + ACCESS_TOKEN
+                },
+                body: JSON.stringify({
+                    session_id: SESSION_ID
+                })
+            }).catch(error => {
+                console.error(
+                    "SESSION CLOSE ERROR:",
+                    error
+                );
+            });
+
+        });
+    </script>
 </body>
 
 </html>

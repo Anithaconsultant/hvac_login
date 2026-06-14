@@ -238,6 +238,21 @@
 
     const loginError = document.getElementById('login-error');
 
+    const serverLimitError = document.getElementById('server-limit-error');
+
+    // ===============================
+    // IF LOGIN ERROR EXISTS
+    // SKIP INTRO SCREEN
+    // ===============================
+    if (loginError || serverLimitError) {
+
+      introContainer.style.display = 'none';
+
+      loginPage.style.display = 'block';
+
+      return;
+    }
+
     // PLAY BUTTON CLICK
     playBtn.addEventListener('click', function () {
 

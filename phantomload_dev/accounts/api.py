@@ -1,8 +1,8 @@
+from datetime import timedelta
 import random
+from django.contrib.sessions.models import Session
 from num2words import num2words
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView
-)
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework import generics, status
@@ -16,11 +16,14 @@ from django.conf import settings
 import logging
 from num2words import num2words
 from rest_framework.decorators import api_view
-from .models import ActiveSession,LoadShredderRecord,UserGameProgress
+from .models import ActiveSession,LoadShredderRecord,UserGameProgress,WebGLSession
 from .utils import can_user_login
 import uuid
 from django.db import transaction
-
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.authentication import SessionAuthentication
 User = get_user_model()
 
 
@@ -104,27 +107,17 @@ import json
 
 @api_view(['POST'])
 def unity_logout(request):
-
-    print("API CALLED")
-
-    print("BODY:", request.body)
-
     data = json.loads(request.body)
-
     session_key = data.get("session_key")
-
-    print("SESSION:", session_key)
 
     if not session_key:
         return Response(
             {"error": "session_key is required"},
             status=400
         )
-
     ActiveSession.objects.filter(
         session_key=session_key
     ).delete()
-
     return Response({
         "message": "Logged out successfully"
     })
@@ -134,14 +127,20 @@ class CheckSessionView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        from django.utils import timezone
+        from datetime import timedelta
 
-        active = ActiveSession.objects.filter(
-            user=request.user
-        ).exists()
+        session = ActiveSession.objects.filter(user=request.user).first()
 
-        return Response({
-            "active": active
-        })
+        if not session:
+            return Response({"active": False})
+
+        # 🔥 IMPORTANT: timeout rule (THIS is the real logic)
+        if session.last_seen < timezone.now() - timedelta(minutes=2):
+            return Response({"active": False})
+
+        return Response({"active": True})
+        
 class ClientLoginView(APIView):
 
     def post(self, request):
@@ -178,15 +177,7 @@ class ClientLoginView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        allowed, error = can_user_login(user)
-
-        print("allowed:", allowed)
-
-        if not allowed:
-            return Response({
-                'detail': 'Maximum users reached. Try later.'
-            }, status=status.HTTP_403_FORBIDDEN)
-
+      
         session_key = str(uuid.uuid4())
 
         print("CREATING SESSION")
@@ -201,7 +192,6 @@ class ClientLoginView(APIView):
         refresh = RefreshToken.for_user(user)
 
         return Response({
-            'allowed':allowed,
             'status': 'success',
             'gender':user.gender,
             'user_id': user.id,
@@ -886,6 +876,81 @@ def get_loadshredder_data(request):
         "data": data
     })
     
+@api_view(['GET'])
+def get_loadshredder_data(request):
+    user_id = request.GET.get('user_id')
+
+    if not user_id:
+        return Response({"error": "user_id is required"}, status=400)
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+    records = LoadShredderRecord.objects.filter(user=user).exclude(
+        status="not_started"
+    ).order_by('actual_attempt_number')
+
+    data = []
+    for record in records:
+        data.append({
+            "actual_attempt_number":int(record.actual_attempt_number),
+            "attempt_number": record.attempt_number,
+            "place": record.place,
+            "starting_case": int(record.starting_case) if record.starting_case not in [None, ''] else 0,
+            "current_sf_tr": int(record.current_sf_tr) if record.current_sf_tr not in [None, ''] else 0,
+            "status": record.status,
+            "score": record.score,
+        })
+
+    return Response({
+        "data": data
+    })
+     
+@api_view(['POST'])
+def post_training_data(request): 
+    data = request.data
+    email = data.get('email')
+    attempt_row = UserGameProgress.objects.filter(
+            user=user,
+            level=1,
+            task_number="Training Portal",
+            attempt_number=attempt_number
+        ).first()
+
+    if attempt_row:
+        attempt_row.points_scored = data.get('score')
+        attempt_row.completion_status = data.get('status')
+        attempt_row.time_taken = data.get('time_taken')
+        attempt_row.max_points = data.get('max_points', 100)
+        attempt_row.hint_penalty_points = 0
+        attempt_row.bonus_points = 0
+        attempt_row.tools_earned = []
+        attempt_row.badges = []
+        attempt_row.super_powers = []
+        attempt_row.save()
+
+    else:
+        return Response({
+            "error": f"No matching progress row for attempt {attempt_number}"
+        }, status=404)
+
+    # =========================
+    # ✅ FINAL RESPONSE
+    # =========================
+    return Response({
+        "message": "Saved successfully in both tables",
+        "attempt_used": attempt_number,
+        "actual_attempt_number": actual_attempt_number
+    })
+    
+@api_view(['GET'])
+def get_training_data(request): 
+    return Response({
+        "message": 'pass',
+   
+    })
     
 @api_view(['POST'])
 def save_loadshredder_full(request):
@@ -978,4 +1043,109 @@ def save_loadshredder_full(request):
         "attempt_used": attempt_number,
         "actual_attempt_number": actual_attempt_number
     })
+
+class WebGLPingAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        session_id = request.data.get("session_id")
+        print(
+            f"PING user={request.user.email} "
+            f"session={session_id} "
+            f"time={timezone.now()}"
+        )
+        try:
+
+            session = WebGLSession.objects.get(
+                session_id=session_id,
+                user=request.user
+            )
+            
+            session.last_ping = timezone.now()
+            session.is_alive = True
+            session.save()
+
+            return Response({
+                "status": "ok"
+            })
+
+        except WebGLSession.DoesNotExist:
+
+            return Response(
+                {"error": "Invalid session"},
+                status=404
+            )
+
+class CloseWebGLSessionAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        session_id = request.data.get("session_id")
+        print(
+            f"CLOSE session={session_id}"
+        )
+        if not session_id:
+
+            return Response(
+                {"error": "session_id missing"},
+                status=400
+            )
+
+        try:
+
+            webgl_session = WebGLSession.objects.get(
+                session_id=session_id,
+                 user=request.user
+            )
+
+            webgl_session.status = "closed"
+            webgl_session.is_alive = False
+            webgl_session.last_ping = timezone.now()
+
+            webgl_session.save()
+
+            # active_session = ActiveSession.objects.filter(
+            #     user=webgl_session.user
+            # ).first()
+
+            # if active_session:
+
+            #     # THIS ACTUALLY LOGS OUT THE WEBSITE
+            #     Session.objects.filter(
+            #         session_key=active_session.session_key
+            #     ).delete()
+
+            #     # remove tracking record
+            #     active_session.delete()
+
+            return Response({
+                "status": "closed"
+            })
+
+        except WebGLSession.DoesNotExist:
+
+            return Response(
+                {"error": "Invalid session"},
+                status=404
+            )
+# class WebsiteHeartbeatAPIView(APIView):
+
+#     authentication_classes = [SessionAuthentication]
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+
+#         ActiveSession.objects.update_or_create(
+#             user=request.user,
+#             defaults={
+#                 "last_seen": timezone.now(),
+#                 "session_key": request.session.session_key
+#             }
+#         )
+
+#         return Response({"status": "ok"})
     
