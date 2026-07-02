@@ -49,7 +49,59 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, first_name, last_name, password, **extra_fields)
-    
+   
+
+
+class WebGLSession(models.Model):
+
+    STATUS_CHOICES = [
+        ("active", "Active"),
+        ("inactive", "Inactive"),
+        ("closed", "Closed"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    session_id = models.CharField(
+        max_length=100,
+        unique=True
+    )
+
+    browser_session_key = models.CharField(
+        max_length=100
+    )
+
+    started_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    last_ping = models.DateTimeField(
+        auto_now=True
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="active"
+    )
+
+    is_alive = models.BooleanField(
+        default=True
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["user"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["last_ping"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} - {self.session_id}"
+            
 def generate_group_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
 

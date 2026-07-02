@@ -633,7 +633,7 @@ body {
   padding: 10px;
   border-bottom: 1px solid #e9ecef;
   vertical-align: middle;
-  text-align:center;
+  text-align: center;
 }
 
 .progress-table .col-rank {
@@ -1114,6 +1114,9 @@ body {
 
 .topbar-align {
   width: 100%;
+  position:absolute;
+  z-index:1000;
+  top:0;
 }
 
 /* Mobile Responsive */
@@ -1159,8 +1162,9 @@ body {
     overflow: auto;
 
   }
-  .about-content p{
-    font-size:10px;
+
+  .about-content p {
+    font-size: 10px;
   }
 
   .auth-container {
@@ -1228,9 +1232,12 @@ body {
     align-items: center;
     justify-content: center;
   }
-.data-table .leaderboard-header th,.data-table tbody td{ 
-  font-size:11px;
-}
+
+  .data-table .leaderboard-header th,
+  .data-table tbody td {
+    font-size: 11px;
+  }
+
   .homeicon {
     left: 39px;
     top: 28px;
@@ -1248,6 +1255,17 @@ body {
     top: 5px;
     font-size: 24px;
   }
+}
+
+.taskList {
+  position: absolute;
+  top: -28px;
+  width: 100%;
+  text-align: center;
+}
+
+.taskList a {
+  margin-right: 10px;
 }
 
 @media (min-width: 576px) and (max-width: 767.98px) {

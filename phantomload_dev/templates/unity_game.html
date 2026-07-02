@@ -29,7 +29,7 @@
 
     <script>
 
-        window.gameAuthToken = "{{ jwt_token|escapejs }}";
+        window.gameAuthToken = "{{ access_token|escapejs }}";
 
         window.username = "{{ username|escapejs }}";
 
@@ -308,7 +308,7 @@
         let ACCESS_TOKEN =
             "{{ access_token|escapejs }}";
 
-        const REFRESH_TOKEN =
+        let REFRESH_TOKEN =
             "{{ refresh_token|escapejs }}";
 
         // ==========================================
@@ -347,7 +347,9 @@
 
                 ACCESS_TOKEN =
                     data.access;
-
+                if (data.refresh) {
+                    REFRESH_TOKEN = data.refresh;
+                }
                 console.log(
                     "Access token refreshed"
                 );

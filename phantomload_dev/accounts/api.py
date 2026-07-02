@@ -340,7 +340,12 @@ class Task11TicketFixesApi(APIView):
 
                     if isinstance(value, str):
                         value = value.strip()
-                        if value.lower() in ("", "na", "nan", "null"):
+                        if value.upper() == "TRUE":
+                            value = True
+                        elif value.upper() == "FALSE":
+                            value = False
+
+                        elif value.lower() in ("", "na", "nan", "null"):
                             continue
 
                     cleaned_row[key] = value
@@ -908,42 +913,42 @@ def get_loadshredder_data(request):
         "data": data
     })
      
-@api_view(['POST'])
-def post_training_data(request): 
-    data = request.data
-    email = data.get('email')
-    attempt_row = UserGameProgress.objects.filter(
-            user=user,
-            level=1,
-            task_number="Training Portal",
-            attempt_number=attempt_number
-        ).first()
+# @api_view(['POST'])
+# def post_training_data(request): 
+#     data = request.data
+#     email = data.get('email')
+#     attempt_row = UserGameProgress.objects.filter(
+#             user=user,
+#             level=1,
+#             task_number="Training Portal",
+#             attempt_number=attempt_number
+#         ).first()
 
-    if attempt_row:
-        attempt_row.points_scored = data.get('score')
-        attempt_row.completion_status = data.get('status')
-        attempt_row.time_taken = data.get('time_taken')
-        attempt_row.max_points = data.get('max_points', 100)
-        attempt_row.hint_penalty_points = 0
-        attempt_row.bonus_points = 0
-        attempt_row.tools_earned = []
-        attempt_row.badges = []
-        attempt_row.super_powers = []
-        attempt_row.save()
+#     if attempt_row:
+#         attempt_row.points_scored = data.get('score')
+#         attempt_row.completion_status = data.get('status')
+#         attempt_row.time_taken = data.get('time_taken')
+#         attempt_row.max_points = data.get('max_points', 100)
+#         attempt_row.hint_penalty_points = 0
+#         attempt_row.bonus_points = 0
+#         attempt_row.tools_earned = []
+#         attempt_row.badges = []
+#         attempt_row.super_powers = []
+#         attempt_row.save()
 
-    else:
-        return Response({
-            "error": f"No matching progress row for attempt {attempt_number}"
-        }, status=404)
+#     else:
+#         return Response({
+#             "error": f"No matching progress row for attempt {attempt_number}"
+#         }, status=404)
 
-    # =========================
-    # ✅ FINAL RESPONSE
-    # =========================
-    return Response({
-        "message": "Saved successfully in both tables",
-        "attempt_used": attempt_number,
-        "actual_attempt_number": actual_attempt_number
-    })
+#     # =========================
+#     # ✅ FINAL RESPONSE
+#     # =========================
+#     return Response({
+#         "message": "Saved successfully in both tables",
+#         "attempt_used": attempt_number,
+#         "actual_attempt_number": actual_attempt_number
+#     })
     
 @api_view(['GET'])
 def get_training_data(request): 
@@ -1132,20 +1137,65 @@ class CloseWebGLSessionAPIView(APIView):
                 {"error": "Invalid session"},
                 status=404
             )
-# class WebsiteHeartbeatAPIView(APIView):
 
-#     authentication_classes = [SessionAuthentication]
-#     permission_classes = [IsAuthenticated]
+@api_view(['POST'])
+def post_training_data(request):
+    data = request.data
+    email = data.get("email")
+    module_number = data.get("module_number")
 
-#     def post(self, request):
+    if not email:
+        return Response({"error": "email is required"}, status=400)
 
-#         ActiveSession.objects.update_or_create(
-#             user=request.user,
-#             defaults={
-#                 "last_seen": timezone.now(),
-#                 "session_key": request.session.session_key
-#             }
-#         )
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
 
-#         return Response({"status": "ok"})
-    
+    with transaction.atomic():
+        task_number = f"Training_Module - {module_number}"
+        # Find existing training progress for this user & module
+        progress = UserGameProgress.objects.filter(
+            user=user,
+            task_number=task_number
+        ).first()
+
+        if progress:
+
+            # Update existing row
+            progress.attempt_number += 1
+            progress.points_scored = data.get("score")
+            progress.completion_status = data.get("status")
+            progress.time_taken = data.get("time_taken", 0)
+            progress.max_points = data.get("max_points", 100)
+            progress.hint_penalty_points = 0
+            progress.bonus_points = 0
+            progress.tools_earned = []
+            progress.badges = []
+            progress.super_powers = []
+            progress.save()
+
+        else:
+
+            # First attempt
+            progress = UserGameProgress.objects.create(
+                user=user,
+                level=1,
+                task_number=task_number,
+                attempt_number=1,
+                points_scored=data.get("score"),
+                completion_status=data.get("status"),
+                time_taken=data.get("time_taken", 0),
+                max_points=data.get("max_points", 100),
+                hint_penalty_points=0,
+                bonus_points=0,
+                tools_earned=[],
+                badges=[],
+                super_powers=[]
+            )
+
+    return Response({
+        "message": "Training saved successfully",
+        "attempt_number": progress.attempt_number,
+        "module_number": module_number
+    })

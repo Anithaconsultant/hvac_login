@@ -30,14 +30,42 @@ class CustomUserAdmin(UserAdmin):
 
 
     
-from .models import ActiveSession
+from .models import ActiveSession,WebGLSession
 
 @admin.register(ActiveSession)
 class ActiveSessionAdmin(admin.ModelAdmin):
     list_display = ("user", "session_key", "login_time")
     search_fields = ("user__username", "user__email")
 
+@admin.register(WebGLSession)
+class WebGLSessionAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "session_id",
+        "status",
+        "is_alive",
+        "started_at",
+        "last_ping",
+    )
 
+    list_filter = (
+        "status",
+        "is_alive",
+        "started_at",
+    )
+
+    search_fields = (
+        "user__email",
+        "session_id",
+        "browser_session_key",
+    )
+
+    ordering = ("-last_ping",)
+
+    readonly_fields = (
+        "started_at",
+        "last_ping",
+    )
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
